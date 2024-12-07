@@ -1,39 +1,53 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { Redirect, Slot } from "expo-router";
+import { RootSiblingParent } from "react-native-root-siblings";
+import { useState, useEffect } from "react";
+import Entypo from "@expo/vector-icons/Entypo";
+import * as Font from "expo-font";
+import { useAuthStore } from "@/hooks/use-auth";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+	const [loaded, setLoaded] = useState(false);
+	const { auth } = useAuthStore();
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+	useEffect(() => {
+		async function prepare() {
+			try {
+				// Pre-load fonts, make any API calls you need to do here
+				await Font.loadAsync(Entypo.font);
+				// Artificially delay for two seconds to simulate a slow loading
+				// experience. Please remove this if you copy and paste the code!
+				// await new Promise((resolve) => setTimeout(resolve, 2000));
+			} catch (e) {
+				console.warn(e);
+			} finally {
+				// Tell the application to render
+				setLoaded(true);
+				console.log(auth.isLoggedIn);
+			}
+		}
 
-  if (!loaded) {
-    return null;
-  }
+		prepare();
+	}, [auth]);
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+	if (!loaded) {
+		return <Slot />;
+	}
+
+	return (
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<BottomSheetModalProvider>
+				<RootSiblingParent>
+					<Slot />
+					{auth.isLoggedIn ? (
+						<Redirect href="/(tabs)" />
+					) : (
+						<Redirect href="/(stack)/login" />
+					)}
+					{/* </Stack> */}
+				</RootSiblingParent>
+			</BottomSheetModalProvider>
+		</GestureHandlerRootView>
+	);
 }

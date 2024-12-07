@@ -1,74 +1,92 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, Text, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+	const router = useRouter();
+	return (
+		<View
+			style={{
+				flex: 1,
+				justifyContent: "center",
+				alignItems: "center",
+				padding: 24,
+				backgroundColor: "#f5f5f5",
+			}}
+		>
+			<Text
+				style={{
+					fontSize: 32,
+					marginBottom: 40,
+					fontWeight: "bold",
+					color: "#333",
+					textShadowColor: "rgba(0, 0, 0, 0.1)",
+					textShadowOffset: { width: 1, height: 1 },
+					textShadowRadius: 2,
+				}}
+			>
+				Hello, Admin
+			</Text>
+			<View style={{ width: "100%", maxWidth: 320 }}>
+				<TouchableOpacity
+					style={{
+						backgroundColor: "rgba(123, 69, 166, 0.8)",
+						borderWidth: 2,
+						borderColor: "rgba(123, 69, 166, 1.0)",
+						padding: 20,
+						borderRadius: 16,
+						alignItems: "center",
+						marginBottom: 16,
+						shadowColor: "#000",
+						shadowOffset: { width: 0, height: 2 },
+						shadowOpacity: 0.2,
+						shadowRadius: 4,
+					}}
+				>
+					<Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>
+						Study Plans
+					</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => router.navigate("/(tabs)/progress")}
+					style={{
+						backgroundColor: "rgba(255, 140, 0, 0.6)",
+						borderWidth: 2,
+						borderColor: "rgba(255, 140, 0, 1.0)",
+						padding: 20,
+						borderRadius: 16,
+						alignItems: "center",
+						marginBottom: 16,
+						shadowColor: "#000",
+						shadowOffset: { width: 0, height: 2 },
+						shadowOpacity: 0.2,
+						shadowRadius: 4,
+					}}
+				>
+					<Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>
+						Progress
+					</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => router.navigate("/(tabs)/tasks")}
+					style={{
+						backgroundColor: "rgba(34, 139, 34, 0.8)",
+						borderWidth: 2,
+						borderColor: "rgba(34, 139, 34, 1.0)",
+						padding: 20,
+						borderRadius: 16,
+						alignItems: "center",
+						marginBottom: 16,
+						shadowColor: "#000",
+						shadowOffset: { width: 0, height: 2 },
+						shadowOpacity: 0.2,
+						shadowRadius: 4,
+					}}
+				>
+					<Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>
+						Tasks
+					</Text>
+				</TouchableOpacity>
+			</View>
+		</View>
+	);
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
