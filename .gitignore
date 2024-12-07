@@ -44,3 +44,5 @@ web-build/
 
 android/
 ios/
+
+*.apk
