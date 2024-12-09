@@ -1,9 +1,9 @@
-import { useTaskStore } from "@/hooks/use-task";
+import { useProgressStore } from "@/hooks/use-progress";
 import Toast from "react-native-root-toast";
 import DateTimePicker, {
 	type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import moment from "moment";
 import React, { useCallback, useState } from "react";
 import {
@@ -14,29 +14,29 @@ import {
 	View,
 	StyleSheet,
 } from "react-native";
-import Dropdown from "@/components/dropdown";
-import { createId } from "@paralleldrive/cuid2";
-import type { TTask } from "@/types/task.types";
+import type { TProgress } from "@/types/progress.types";
+import Slider from "@react-native-community/slider";
 
-const reminderOptions = [
-	{ label: "Everyday", value: "Everyday" },
-	{ label: "1 day before", value: "1 day before" },
-	{ label: "1 week before", value: "1 week before" },
-];
-
-export default function AddTaskScreen() {
+export default function EditProgressScreen() {
 	const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 	const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
 
-	const [taskState, setTaskState] = useState<TTask>({
-		id: "",
-		title: "",
-		due: new Date(),
-		reminder: "",
-		completed: false,
-	});
+	const { progress, updateProgress } = useProgressStore();
 
-	const { addTask: setTasks } = useTaskStore();
+	const { id } = useLocalSearchParams();
+
+	const currentProgress = progress.find((p) => p.id === id);
+
+	const [sliderValue, setSliderValue] = useState<number>(
+		currentProgress?.progress || 0,
+	);
+
+	const [progressState, setProgressState] = useState<TProgress>({
+		id: currentProgress?.id || "",
+		title: currentProgress?.title || "",
+		due: currentProgress?.due || new Date(),
+		progress: currentProgress?.progress || 0,
+	});
 
 	const router = useRouter();
 
@@ -44,13 +44,13 @@ export default function AddTaskScreen() {
 		event: DateTimePickerEvent,
 		selectedDate: Date | undefined,
 	) => {
-		setTaskState({ ...taskState, due: selectedDate || new Date() });
+		setProgressState({ ...progressState, due: selectedDate || new Date() });
 		setShowDatePicker(false);
 		setShowTimePicker(!showTimePicker);
 	};
 
 	const onSubmit = useCallback(() => {
-		if (!taskState.title || !taskState.reminder) {
+		if (!progressState.title) {
 			Toast.show("Please fill all the input", {
 				containerStyle: {
 					backgroundColor: "#ff0000",
@@ -63,7 +63,7 @@ export default function AddTaskScreen() {
 
 			return;
 		}
-		if (taskState.due <= new Date()) {
+		if (progressState.due <= new Date()) {
 			Toast.show("Please select a future date", {
 				containerStyle: {
 					backgroundColor: "#ff0000",
@@ -76,30 +76,16 @@ export default function AddTaskScreen() {
 			return;
 		}
 
-		setTasks({
-			id: createId(),
-			title: taskState.title,
-			due: taskState.due,
-			reminder: taskState.reminder,
-			completed: false,
-		});
+		updateProgress(currentProgress?.id || "", sliderValue * 100);
 
-		setTaskState({
-			id: "",
-			title: "",
-			due: new Date(),
-			reminder: "",
-			completed: false,
-		});
-
-		router.navigate("/(tabs)/tasks");
-	}, [taskState, setTasks, router]);
+		router.navigate("/(tabs)/progress");
+	}, [progressState, updateProgress, router, sliderValue, currentProgress]);
 
 	return (
 		<View style={styles.backdrop}>
 			<Stack.Screen
 				options={{
-					title: "Add Task",
+					title: "Update Progress",
 					headerShown: true,
 					// headerBackTitle: "Back",
 					headerBackButtonDisplayMode: "minimal",
@@ -111,7 +97,7 @@ export default function AddTaskScreen() {
 					flex: 1,
 				}}
 			>
-				<Text style={styles.label}>Task</Text>
+				<Text style={styles.label}>Subject</Text>
 				<TextInput
 					style={{
 						height: 40,
@@ -121,8 +107,10 @@ export default function AddTaskScreen() {
 						padding: 8,
 						backgroundColor: "#f9f9f9",
 					}}
-					onChangeText={(text) => setTaskState({ ...taskState, title: text })}
-					value={taskState.title}
+					onChangeText={(text) =>
+						setProgressState({ ...progressState, title: text })
+					}
+					value={progressState.title}
 				/>
 				<View
 					style={{
@@ -133,7 +121,7 @@ export default function AddTaskScreen() {
 				{Platform.OS === "ios" ? (
 					<DateTimePicker
 						mode="datetime"
-						value={taskState.due}
+						value={progressState.due}
 						onChange={onChangeDate}
 						accentColor="#7b45a6"
 					/>
@@ -143,12 +131,12 @@ export default function AddTaskScreen() {
 							onPress={() => setShowDatePicker(true)}
 							style={{ paddingVertical: 8, paddingHorizontal: 12 }}
 						>
-							<Text>{moment(taskState.due).format("h:mm A")}</Text>
+							<Text>{moment(progressState.due).format("h:mm A")}</Text>
 						</TouchableOpacity>
 						{showDatePicker && (
 							<DateTimePicker
 								mode="date"
-								value={taskState.due}
+								value={progressState.due}
 								onChange={onChangeDate}
 								accentColor="#7b45a6"
 							/>
@@ -156,7 +144,7 @@ export default function AddTaskScreen() {
 						{showTimePicker && (
 							<DateTimePicker
 								mode="time"
-								value={taskState.due}
+								value={progressState.due}
 								onChange={onChangeDate}
 								accentColor="#7b45a6"
 							/>
@@ -170,24 +158,26 @@ export default function AddTaskScreen() {
 						marginTop: 8,
 					}}
 				>
-					{moment(taskState.due).format("dddd, D MMM YYYY, h:mm A")}
+					{moment(progressState.due).format("dddd, D MMM YYYY, h:mm A")}
 				</Text>
 				<View
 					style={{
 						height: 16,
 					}}
 				/>
-				<Text style={styles.label}>Task Reminder</Text>
-				<Dropdown
-					data={reminderOptions}
-					onChange={(item) =>
-						setTaskState({ ...taskState, reminder: item.value })
-					}
-					placeholder="Select Reminder"
+				<Text style={styles.label}>Due</Text>
+				<Slider
+					style={{ width: 200, height: 40 }}
+					minimumValue={0}
+					maximumValue={1}
+					minimumTrackTintColor="#FFFFFF"
+					maximumTrackTintColor="#000000"
+					value={sliderValue}
+					onValueChange={(value) => setSliderValue(value)}
 				/>
 			</View>
 			<TouchableOpacity onPress={onSubmit} style={styles.submitButton}>
-				<Text style={styles.submitButtonText}>Add Task</Text>
+				<Text style={styles.submitButtonText}>Update Progress</Text>
 			</TouchableOpacity>
 		</View>
 	);

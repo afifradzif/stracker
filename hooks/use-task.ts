@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Task } from "@/types/task.types";
+import type { TTask } from "@/types/task.types";
 
 interface TaskStore {
-	tasks: Task[];
-	addTask: (tasks: Task) => void;
+	tasks: TTask[];
+	addTask: (tasks: TTask) => void;
 	setCompleted: (id: string, completed: boolean) => void;
 	removeTask: (id: string) => void;
 	clearTasks: () => void;
