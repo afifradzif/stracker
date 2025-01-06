@@ -62,6 +62,7 @@ export default function LoginScreen() {
 			<View style={loginStyles.inputContainer}>
 				<TextInput
 					placeholder="Username"
+					placeholderTextColor="#999"
 					style={loginStyles.input}
 					keyboardType="default"
 					autoCapitalize="none"
@@ -71,6 +72,7 @@ export default function LoginScreen() {
 				/>
 				<TextInput
 					placeholder="Password"
+					placeholderTextColor="#999"
 					style={loginStyles.input}
 					secureTextEntry
 					onChangeText={(text) =>
@@ -110,6 +112,7 @@ const loginStyles = StyleSheet.create({
 		borderRadius: 8,
 		padding: 12,
 		fontSize: 16,
+		color: "#000",
 	},
 	loginButton: {
 		backgroundColor: "#7b45a6",

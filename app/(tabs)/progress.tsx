@@ -1,6 +1,5 @@
-import { useProgressStore } from "@/hooks/use-progress";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { Tabs, useRouter } from "expo-router";
+import { Link, Tabs, useRouter } from "expo-router";
 import {
 	View,
 	Text,
@@ -16,10 +15,12 @@ import {
 	type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { useCallback, useRef, useState } from "react";
+import { useTaskStore } from "@/hooks/use-task";
+import moment from "moment";
 
 export default function ProgressScreen() {
 	const router = useRouter();
-	const { progress, removeProgress } = useProgressStore();
+	const { tasks, removeTask } = useTaskStore();
 	const [selectedProgressId, setSelectedProgressId] = useState<string | null>(
 		null,
 	);
@@ -35,10 +36,10 @@ export default function ProgressScreen() {
 
 	const handleDeleteProgress = useCallback(() => {
 		if (selectedProgressId) {
-			removeProgress(selectedProgressId);
+			removeTask(selectedProgressId);
 		}
 		bottomSheetModalRef.current?.dismiss();
-	}, [selectedProgressId, removeProgress]);
+	}, [selectedProgressId, removeTask]);
 
 	const renderBackdrop = useCallback(
 		(props: BottomSheetBackdropProps) => (
@@ -60,18 +61,14 @@ export default function ProgressScreen() {
 				justifyContent: "center",
 				alignItems: "center",
 				width: Dimensions.get("window").width,
-				padding: 16,
 			}}
 		>
 			<Tabs.Screen
 				options={{
 					headerRight: () => (
-						<TouchableOpacity
-							style={{ marginRight: 16 }}
-							onPress={() => router.navigate("/(stack)/add-progress")}
-						>
+						<Link push style={{ marginRight: 16 }} href="/(stack)/add-tasks">
 							<AntDesign name="plus" size={24} color="black" />
-						</TouchableOpacity>
+						</Link>
 					),
 				}}
 			/>
@@ -82,7 +79,7 @@ export default function ProgressScreen() {
 					marginBottom: 16,
 				}}
 			>
-				{progress.length === 0 ? (
+				{tasks.length === 0 ? (
 					<Text
 						style={{
 							textAlign: "center",
@@ -91,18 +88,62 @@ export default function ProgressScreen() {
 						No progress available
 					</Text>
 				) : (
-					progress.map((item) => (
+					tasks.map((item) => (
 						<TouchableOpacity
 							key={item.id}
 							onPress={() => handlePresentModal(item.id)}
-							style={styles.container}
+							style={{
+								backgroundColor: item.completed ? "#A8E6CF" : "#D6BBEA",
+								borderWidth: 1,
+								borderColor: item.completed ? "#3CB371" : "#7b45a6",
+								width: "100%",
+								position: "relative",
+								height: 100,
+								justifyContent: "center",
+								padding: 16,
+								borderRadius: 10,
+								opacity: item.completed ? 0.8 : 1,
+							}}
 						>
-							<Text style={styles.title}>{item.title}</Text>
+							<View
+								style={{
+									flexDirection: "row",
+									alignItems: "center",
+									gap: 12,
+								}}
+							>
+								<Text
+									style={{
+										fontSize: 24,
+										fontWeight: "bold",
+										textDecorationLine: item.completed
+											? "line-through"
+											: "none",
+										color: item.completed ? "#666" : "#000",
+									}}
+								>
+									{item.title}
+								</Text>
+							</View>
+							<View
+								style={{
+									height: 10,
+								}}
+							/>
 							<View style={styles.progressBar}>
 								<View
 									style={[styles.progressFill, { width: `${item.progress}%` }]}
 								/>
 							</View>
+							<Text
+								style={{
+									position: "absolute",
+									right: 5,
+									bottom: 5,
+								}}
+							>
+								{moment(item.due).format("D MMM YYYY, h:mm A")}
+							</Text>
 						</TouchableOpacity>
 					))
 				)}
@@ -185,6 +226,6 @@ const styles = StyleSheet.create({
 	},
 	progressFill: {
 		height: "100%",
-		backgroundColor: "#007bff",
+		backgroundColor: "#7b45a6",
 	},
 });

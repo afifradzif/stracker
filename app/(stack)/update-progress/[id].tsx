@@ -1,4 +1,4 @@
-import { useProgressStore } from "@/hooks/use-progress";
+import { useTaskStore } from "@/hooks/use-task";
 import Toast from "react-native-root-toast";
 import DateTimePicker, {
 	type DateTimePickerEvent,
@@ -14,28 +14,30 @@ import {
 	View,
 	StyleSheet,
 } from "react-native";
-import type { TProgress } from "@/types/progress.types";
+import type { TTask } from "@/types/task.types";
 import Slider from "@react-native-community/slider";
 
 export default function EditProgressScreen() {
 	const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 	const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
 
-	const { progress, updateProgress } = useProgressStore();
+	const { tasks, updateProgress } = useTaskStore();
 
 	const { id } = useLocalSearchParams();
 
-	const currentProgress = progress.find((p) => p.id === id);
+	const currentTask = tasks.find((p) => p.id === id);
 
 	const [sliderValue, setSliderValue] = useState<number>(
-		currentProgress?.progress || 0,
+		currentTask?.progress || 0,
 	);
 
-	const [progressState, setProgressState] = useState<TProgress>({
-		id: currentProgress?.id || "",
-		title: currentProgress?.title || "",
-		due: currentProgress?.due || new Date(),
-		progress: currentProgress?.progress || 0,
+	const [progressState, setProgressState] = useState<TTask>({
+		id: currentTask?.id || "",
+		title: currentTask?.title || "",
+		due: currentTask?.due || new Date(),
+		reminder: currentTask?.reminder || "",
+		completed: currentTask?.completed || false,
+		progress: currentTask?.progress || 0,
 	});
 
 	const router = useRouter();
@@ -76,10 +78,10 @@ export default function EditProgressScreen() {
 			return;
 		}
 
-		updateProgress(currentProgress?.id || "", sliderValue * 100);
+		updateProgress(currentTask?.id || "", sliderValue * 100);
 
 		router.navigate("/(tabs)/progress");
-	}, [progressState, updateProgress, router, sliderValue, currentProgress]);
+	}, [progressState, updateProgress, router, sliderValue, currentTask]);
 
 	return (
 		<View style={styles.backdrop}>
@@ -165,12 +167,12 @@ export default function EditProgressScreen() {
 						height: 16,
 					}}
 				/>
-				<Text style={styles.label}>Due</Text>
+				<Text style={styles.label}>Progress</Text>
 				<Slider
 					style={{ width: 200, height: 40 }}
 					minimumValue={0}
 					maximumValue={1}
-					minimumTrackTintColor="#FFFFFF"
+					minimumTrackTintColor="#7b45a6"
 					maximumTrackTintColor="#000000"
 					value={sliderValue}
 					onValueChange={(value) => setSliderValue(value)}

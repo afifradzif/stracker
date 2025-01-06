@@ -1,4 +1,4 @@
-import { Tabs, useRouter } from "expo-router";
+import { Link, Tabs, useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useTaskStore } from "@/hooks/use-task";
@@ -64,6 +64,15 @@ export default function TaskScreen() {
 				alignItems: "center",
 			}}
 		>
+			<Tabs.Screen
+				options={{
+					headerRight: () => (
+						<Link style={{ marginRight: 16 }} push href="/(stack)/add-tasks">
+							<AntDesign name="plus" size={24} color="black" />
+						</Link>
+					),
+				}}
+			/>
 			<ScrollView
 				style={{
 					width: "100%",
@@ -71,18 +80,6 @@ export default function TaskScreen() {
 					marginBottom: 16,
 				}}
 			>
-				<Tabs.Screen
-					options={{
-						headerRight: () => (
-							<TouchableOpacity
-								style={{ marginRight: 16 }}
-								onPress={() => router.navigate("/(stack)/add-tasks")}
-							>
-								<AntDesign name="plus" size={24} color="black" />
-							</TouchableOpacity>
-						),
-					}}
-				/>
 				<View
 					style={{
 						display: "flex",

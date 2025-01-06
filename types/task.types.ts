@@ -4,4 +4,5 @@ export type TTask = {
 	due: Date;
 	reminder: string;
 	completed: boolean;
+	progress: number;
 };

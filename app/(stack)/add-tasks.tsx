@@ -34,6 +34,7 @@ export default function AddTaskScreen() {
 		due: new Date(),
 		reminder: "",
 		completed: false,
+		progress: 0,
 	});
 
 	const { addTask: setTasks } = useTaskStore();
@@ -76,12 +77,15 @@ export default function AddTaskScreen() {
 			return;
 		}
 
+		const cuid = createId();
+
 		setTasks({
-			id: createId(),
+			id: cuid,
 			title: taskState.title,
 			due: taskState.due,
 			reminder: taskState.reminder,
 			completed: false,
+			progress: 0,
 		});
 
 		setTaskState({
@@ -90,6 +94,7 @@ export default function AddTaskScreen() {
 			due: new Date(),
 			reminder: "",
 			completed: false,
+			progress: 0,
 		});
 
 		router.navigate("/(tabs)/tasks");
@@ -111,7 +116,7 @@ export default function AddTaskScreen() {
 					flex: 1,
 				}}
 			>
-				<Text style={styles.label}>Task</Text>
+				<Text style={styles.label}>Task Name</Text>
 				<TextInput
 					style={{
 						height: 40,
@@ -129,7 +134,7 @@ export default function AddTaskScreen() {
 						height: 16,
 					}}
 				/>
-				<Text style={styles.label}>Due</Text>
+				<Text style={styles.label}>Task Due</Text>
 				{Platform.OS === "ios" ? (
 					<DateTimePicker
 						mode="datetime"

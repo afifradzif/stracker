@@ -1,6 +1,27 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+	createJSONStorage,
+	persist,
+	type StateStorage,
+} from "zustand/middleware";
+import { MMKV } from "react-native-mmkv";
+
+const mmkv = new MMKV({
+	id: "auth-store",
+});
+
+const mmkvStorage: StateStorage = {
+	setItem: (name, value) => {
+		return mmkv.set(name, value);
+	},
+	getItem: (name) => {
+		const value = mmkv.getString(name);
+		return value ?? null;
+	},
+	removeItem: (name) => {
+		return mmkv.delete(name);
+	},
+};
 
 interface Auth {
 	username: string;
@@ -36,7 +57,7 @@ export const useAuthStore = create(
 		}),
 		{
 			name: "auth-store",
-			storage: createJSONStorage(() => AsyncStorage),
+			storage: createJSONStorage(() => mmkvStorage),
 		},
 	),
 );
