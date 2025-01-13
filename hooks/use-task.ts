@@ -41,7 +41,9 @@ export const useTaskStore = create(
 			setCompleted: (id, completed) => {
 				const currentTasks = get().tasks;
 				const updatedTasks = currentTasks.map((task) =>
-					task.id === id ? { ...task, completed } : task,
+					task.id === id
+						? { ...task, completed, progress: !completed ? 0 : 100 }
+						: task,
 				);
 				set({ tasks: updatedTasks });
 			},

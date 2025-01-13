@@ -79,77 +79,85 @@ export default function ProgressScreen() {
 					marginBottom: 16,
 				}}
 			>
-				{tasks.length === 0 ? (
-					<Text
-						style={{
-							textAlign: "center",
-						}}
-					>
-						No progress available
-					</Text>
-				) : (
-					tasks.map((item) => (
-						<TouchableOpacity
-							key={item.id}
-							onPress={() => handlePresentModal(item.id)}
+				<View
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						gap: 16,
+					}}
+				>
+					{tasks.length === 0 ? (
+						<Text
 							style={{
-								backgroundColor: item.completed ? "#A8E6CF" : "#D6BBEA",
-								borderWidth: 1,
-								borderColor: item.completed ? "#3CB371" : "#7b45a6",
-								width: "100%",
-								position: "relative",
-								height: 100,
-								justifyContent: "center",
-								padding: 16,
-								borderRadius: 10,
-								opacity: item.completed ? 0.8 : 1,
+								textAlign: "center",
 							}}
 						>
-							<View
+							No progress available
+						</Text>
+					) : (
+						tasks.map((item) => (
+							<TouchableOpacity
+								key={item.id}
+								onPress={() => handlePresentModal(item.id)}
 								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 12,
+									backgroundColor: item.completed ? "#A8E6CF" : "#D6BBEA",
+									borderWidth: 1,
+									borderColor: item.completed ? "#3CB371" : "#7b45a6",
+									width: "100%",
+									position: "relative",
+									height: 100,
+									justifyContent: "center",
+									padding: 16,
+									borderRadius: 10,
+									opacity: item.completed ? 0.8 : 1,
 								}}
 							>
-								<Text
+								<View
 									style={{
-										fontSize: 24,
-										fontWeight: "bold",
-										textDecorationLine: item.completed
-											? "line-through"
-											: "none",
-										color: item.completed ? "#666" : "#000",
+										flexDirection: "row",
+										alignItems: "center",
+										gap: 12,
 									}}
 								>
-									{item.title}
-								</Text>
-							</View>
-							<View
-								style={{
-									height: 10,
-								}}
-							/>
-							<View style={styles.progressBar}>
+									<Text
+										style={{
+											fontSize: 24,
+											fontWeight: "bold",
+											textDecorationLine: item.completed
+												? "line-through"
+												: "none",
+											color: item.completed ? "#666" : "#000",
+										}}
+									>
+										{item.title}
+									</Text>
+								</View>
 								<View
-									style={[
-										styles.progressFill,
-										{ width: `${item.progress * 100}%` },
-									]}
+									style={{
+										height: 10,
+									}}
 								/>
-							</View>
-							<Text
-								style={{
-									position: "absolute",
-									right: 5,
-									bottom: 5,
-								}}
-							>
-								{moment(item.due).format("D MMM YYYY, h:mm A")}
-							</Text>
-						</TouchableOpacity>
-					))
-				)}
+								<View style={styles.progressBar}>
+									<View
+										style={[
+											styles.progressFill,
+											{ width: `${item.progress * 100}%` },
+										]}
+									/>
+								</View>
+								<Text
+									style={{
+										position: "absolute",
+										right: 5,
+										bottom: 5,
+									}}
+								>
+									{moment(item.due).format("D MMM YYYY, h:mm A")}
+								</Text>
+							</TouchableOpacity>
+						))
+					)}
+				</View>
 			</ScrollView>
 			<BottomSheetModal
 				ref={bottomSheetModalRef}
