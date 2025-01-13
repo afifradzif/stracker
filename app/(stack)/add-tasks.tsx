@@ -17,6 +17,7 @@ import {
 import Dropdown from "@/components/dropdown";
 import { createId } from "@paralleldrive/cuid2";
 import type { TTask } from "@/types/task.types";
+import Slider from "@react-native-community/slider";
 
 const reminderOptions = [
 	{ label: "Everyday", value: "Everyday" },
@@ -85,7 +86,7 @@ export default function AddTaskScreen() {
 			due: taskState.due,
 			reminder: taskState.reminder,
 			completed: false,
-			progress: 0,
+			progress: taskState.progress,
 		});
 
 		setTaskState({
@@ -108,6 +109,7 @@ export default function AddTaskScreen() {
 					headerShown: true,
 					// headerBackTitle: "Back",
 					headerBackButtonDisplayMode: "minimal",
+					headerBackButtonMenuEnabled: true,
 				}}
 			/>
 			<View
@@ -190,7 +192,39 @@ export default function AddTaskScreen() {
 					}
 					placeholder="Select Reminder"
 				/>
+				<View
+					style={{
+						height: 16,
+					}}
+				/>
+				<View>
+					<Text style={styles.label}>Task Progress</Text>
+					<View
+						style={{
+							backgroundColor: "#f9f9f9",
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "center",
+							alignItems: "center",
+							borderRadius: 8,
+						}}
+					>
+						<Slider
+							style={{ width: 200, height: 40 }}
+							minimumValue={0}
+							maximumValue={1}
+							minimumTrackTintColor="#7b45a6"
+							maximumTrackTintColor="#000000"
+							value={taskState.progress}
+							onSlidingComplete={(value) =>
+								setTaskState({ ...taskState, progress: value })
+							}
+						/>
+						<Text>{Math.round(taskState.progress * 100)}%</Text>
+					</View>
+				</View>
 			</View>
+
 			<TouchableOpacity onPress={onSubmit} style={styles.submitButton}>
 				<Text style={styles.submitButtonText}>Add Task</Text>
 			</TouchableOpacity>

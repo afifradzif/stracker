@@ -21,20 +21,17 @@ export default function EditProgressScreen() {
 	const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 	const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
 
-	const { tasks, updateProgress } = useTaskStore();
+	const { tasks, updateTask } = useTaskStore();
 
 	const { id } = useLocalSearchParams();
 
 	const currentTask = tasks.find((p) => p.id === id);
-
-	const [sliderValue, setSliderValue] = useState<number>(
-		currentTask?.progress || 0,
-	);
+	console.log("currentTask", currentTask);
 
 	const [progressState, setProgressState] = useState<TTask>({
 		id: currentTask?.id || "",
 		title: currentTask?.title || "",
-		due: currentTask?.due || new Date(),
+		due: new Date(currentTask!.due.toString()) || new Date(),
 		reminder: currentTask?.reminder || "",
 		completed: currentTask?.completed || false,
 		progress: currentTask?.progress || 0,
@@ -78,110 +75,129 @@ export default function EditProgressScreen() {
 			return;
 		}
 
-		updateProgress(currentTask?.id || "", sliderValue * 100);
+		// updateProgress(currentTask?.id || "", sliderValue * 100);
+		updateTask(progressState.id, progressState);
 
 		router.navigate("/(tabs)/progress");
-	}, [progressState, updateProgress, router, sliderValue, currentTask]);
+	}, [progressState, updateTask, router]);
 
 	return (
-		<View style={styles.backdrop}>
-			<Stack.Screen
-				options={{
-					title: "Update Progress",
-					headerShown: true,
-					// headerBackTitle: "Back",
-					headerBackButtonDisplayMode: "minimal",
-				}}
-			/>
-			<View
-				style={{
-					width: "100%",
-					flex: 1,
-				}}
-			>
-				<Text style={styles.label}>Subject</Text>
-				<TextInput
-					style={{
-						height: 40,
-						borderColor: "gray",
-						borderWidth: 1,
-						borderRadius: 8,
-						padding: 8,
-						backgroundColor: "#f9f9f9",
+		currentTask && (
+			<View style={styles.backdrop}>
+				<Stack.Screen
+					options={{
+						title: "Update Progress",
+						headerShown: true,
+						// headerBackTitle: "Back",
+						headerBackButtonDisplayMode: "minimal",
 					}}
-					onChangeText={(text) =>
-						setProgressState({ ...progressState, title: text })
-					}
-					value={progressState.title}
 				/>
 				<View
 					style={{
-						height: 16,
-					}}
-				/>
-				<Text style={styles.label}>Due</Text>
-				{Platform.OS === "ios" ? (
-					<DateTimePicker
-						mode="datetime"
-						value={progressState.due}
-						onChange={onChangeDate}
-						accentColor="#7b45a6"
-					/>
-				) : (
-					<>
-						<TouchableOpacity
-							onPress={() => setShowDatePicker(true)}
-							style={{ paddingVertical: 8, paddingHorizontal: 12 }}
-						>
-							<Text>{moment(progressState.due).format("h:mm A")}</Text>
-						</TouchableOpacity>
-						{showDatePicker && (
-							<DateTimePicker
-								mode="date"
-								value={progressState.due}
-								onChange={onChangeDate}
-								accentColor="#7b45a6"
-							/>
-						)}
-						{showTimePicker && (
-							<DateTimePicker
-								mode="time"
-								value={progressState.due}
-								onChange={onChangeDate}
-								accentColor="#7b45a6"
-							/>
-						)}
-					</>
-				)}
-				<Text
-					style={{
-						fontSize: 16,
-						color: "#666",
-						marginTop: 8,
+						width: "100%",
+						flex: 1,
 					}}
 				>
-					{moment(progressState.due).format("dddd, D MMM YYYY, h:mm A")}
-				</Text>
-				<View
-					style={{
-						height: 16,
-					}}
-				/>
-				<Text style={styles.label}>Progress</Text>
-				<Slider
-					style={{ width: 200, height: 40 }}
-					minimumValue={0}
-					maximumValue={1}
-					minimumTrackTintColor="#7b45a6"
-					maximumTrackTintColor="#000000"
-					value={sliderValue}
-					onValueChange={(value) => setSliderValue(value)}
-				/>
+					<Text style={styles.label}>Subject</Text>
+					<TextInput
+						style={{
+							height: 40,
+							borderColor: "gray",
+							borderWidth: 1,
+							borderRadius: 8,
+							padding: 8,
+							backgroundColor: "#f9f9f9",
+						}}
+						onChangeText={(text) =>
+							setProgressState({ ...progressState, title: text })
+						}
+						value={progressState.title}
+					/>
+					<View
+						style={{
+							height: 16,
+						}}
+					/>
+					<Text style={styles.label}>Due</Text>
+					{Platform.OS === "ios" ? (
+						<DateTimePicker
+							mode="datetime"
+							value={progressState.due}
+							onChange={onChangeDate}
+							accentColor="#7b45a6"
+						/>
+					) : (
+						<>
+							<TouchableOpacity
+								onPress={() => setShowDatePicker(true)}
+								style={{ paddingVertical: 8, paddingHorizontal: 12 }}
+							>
+								<Text>{moment(progressState.due).format("h:mm A")}</Text>
+							</TouchableOpacity>
+							{showDatePicker && (
+								<DateTimePicker
+									mode="date"
+									value={progressState.due}
+									onChange={onChangeDate}
+									accentColor="#7b45a6"
+								/>
+							)}
+							{showTimePicker && (
+								<DateTimePicker
+									mode="time"
+									value={progressState.due}
+									onChange={onChangeDate}
+									accentColor="#7b45a6"
+								/>
+							)}
+						</>
+					)}
+					<Text
+						style={{
+							fontSize: 16,
+							color: "#666",
+							marginTop: 8,
+						}}
+					>
+						{moment(progressState.due).format("dddd, D MMM YYYY, h:mm A")}
+					</Text>
+					<View
+						style={{
+							height: 16,
+						}}
+					/>
+					<View>
+						<Text style={styles.label}>Progress</Text>
+						<View
+							style={{
+								backgroundColor: "#f9f9f9",
+								display: "flex",
+								flexDirection: "row",
+								justifyContent: "center",
+								alignItems: "center",
+								borderRadius: 8,
+							}}
+						>
+							<Slider
+								style={{ width: 200, height: 40 }}
+								minimumValue={0}
+								maximumValue={1}
+								minimumTrackTintColor="#7b45a6"
+								maximumTrackTintColor="#000000"
+								value={progressState.progress}
+								onSlidingComplete={(value) =>
+									setProgressState({ ...progressState, progress: value })
+								}
+							/>
+							<Text>{Math.round(progressState.progress * 100)}%</Text>
+						</View>
+					</View>
+				</View>
+				<TouchableOpacity onPress={onSubmit} style={styles.submitButton}>
+					<Text style={styles.submitButtonText}>Update Progress</Text>
+				</TouchableOpacity>
 			</View>
-			<TouchableOpacity onPress={onSubmit} style={styles.submitButton}>
-				<Text style={styles.submitButtonText}>Update Progress</Text>
-			</TouchableOpacity>
-		</View>
+		)
 	);
 }
 

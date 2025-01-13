@@ -27,7 +27,7 @@ const mmkvStorage: StateStorage = {
 interface TaskStore {
 	tasks: TTask[];
 	addTask: (tasks: TTask) => void;
-	updateProgress: (id: string, progress: number) => void;
+	updateTask: (id: string, task: TTask) => void;
 	setCompleted: (id: string, completed: boolean) => void;
 	removeTask: (id: string) => void;
 	clearTasks: () => void;
@@ -45,11 +45,9 @@ export const useTaskStore = create(
 				);
 				set({ tasks: updatedTasks });
 			},
-			updateProgress: (id, progress) => {
+			updateTask: (id, task) => {
 				const currentTasks = get().tasks;
-				const updatedTasks = currentTasks.map((task) =>
-					task.id === id ? { ...task, progress } : task,
-				);
+				const updatedTasks = currentTasks.map((t) => (t.id === id ? task : t));
 				set({ tasks: updatedTasks });
 			},
 			removeTask: (id) =>

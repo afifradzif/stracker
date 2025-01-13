@@ -132,7 +132,10 @@ export default function ProgressScreen() {
 							/>
 							<View style={styles.progressBar}>
 								<View
-									style={[styles.progressFill, { width: `${item.progress}%` }]}
+									style={[
+										styles.progressFill,
+										{ width: `${item.progress * 100}%` },
+									]}
 								/>
 							</View>
 							<Text

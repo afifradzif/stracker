@@ -1,10 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Tabs, useRouter } from "expo-router";
 import { useAuthStore } from "@/hooks/use-auth";
+import { useTaskStore } from "@/hooks/use-task";
 
 const ProfileScreen = () => {
 	const { signOut } = useAuthStore();
+	const { clearTasks } = useTaskStore();
 	const router = useRouter();
+
+	const handleClearData = () => {
+		clearTasks();
+		router.push("/(tabs)");
+	};
 
 	const handleSignOut = () => {
 		signOut();
@@ -38,6 +45,29 @@ const ProfileScreen = () => {
 					Email: example@email.com Phone: 123-456-7890
 				</Text>
 			</View>
+			<TouchableOpacity
+				onPress={handleClearData}
+				style={{
+					padding: 16,
+					backgroundColor: "rgba(255, 0, 0, 0.6)",
+					borderWidth: 1,
+					borderColor: "rgba(255, 0, 0, 0.9)",
+					borderRadius: 8,
+				}}
+			>
+				<Text
+					style={{
+						color: "white",
+					}}
+				>
+					Clear All Data
+				</Text>
+			</TouchableOpacity>
+			<View
+				style={{
+					height: 16,
+				}}
+			/>
 			<TouchableOpacity
 				onPress={handleSignOut}
 				style={{
