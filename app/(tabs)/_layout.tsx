@@ -30,6 +30,15 @@ export default function TabsLayout() {
 				}}
 			/>
 			<Tabs.Screen
+				name="study"
+				options={{
+					title: "Study Plan",
+					tabBarIcon: ({ color }) => (
+						<AntDesign size={28} name="book" color={color} />
+					),
+				}}
+			/>
+			<Tabs.Screen
 				name="progress"
 				options={{
 					title: "Progress",

@@ -6,7 +6,6 @@ import * as Font from "expo-font";
 import { useAuthStore } from "@/hooks/use-auth";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import * as Calendar from "expo-calendar";
 
 export default function RootLayout() {
 	const [loaded, setLoaded] = useState(false);
@@ -31,19 +30,6 @@ export default function RootLayout() {
 
 		prepare();
 	}, [auth]);
-
-	useEffect(() => {
-		(async () => {
-			const { status } = await Calendar.requestCalendarPermissionsAsync();
-			if (status === "granted") {
-				const calendars = await Calendar.getCalendarsAsync(
-					Calendar.EntityTypes.EVENT,
-				);
-				console.log("Here are all your calendars:");
-				console.log({ calendars });
-			}
-		})();
-	}, []);
 
 	if (!loaded) {
 		return <Slot />;

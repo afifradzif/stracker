@@ -28,6 +28,7 @@ export default function HomeScreen() {
 			</Text>
 			<View style={{ width: "100%", maxWidth: 320 }}>
 				<TouchableOpacity
+					onPress={() => router.push("/(stack)/study")}
 					style={{
 						backgroundColor: "rgba(123, 69, 166, 0.8)",
 						borderWidth: 2,
