@@ -14,6 +14,12 @@ export default function TabsLayout() {
 				options={{
 					headerShown: false,
 				}}
+			 />
+			<Stack.Screen
+				name="new-login"
+				options={{
+					headerShown: false,
+				}}
 			/>
 		</Stack>
 	);

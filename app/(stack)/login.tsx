@@ -1,128 +1,50 @@
-import { useAuthStore } from "@/hooks/use-auth";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import {
-	SafeAreaView,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
-} from "react-native";
-import Toast from "react-native-root-toast";
+import { View, Text, TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import CustomButton from "@/components/CustomButton";
+import CustomBackground from "@/components/CustomBackground";
 
 export default function LoginScreen() {
-	const [credentials, setCredentials] = useState({
-		username: "",
-		password: "",
-	});
-
 	const router = useRouter();
-	const { signIn } = useAuthStore();
-
-	const handleLogin = async () => {
-		if (signIn(credentials)) {
-			console.log("Login successful");
-			Toast.show("Login successful", {
-				containerStyle: {
-					backgroundColor: "#00ff00",
-					width: "100%",
-				},
-				shadow: false,
-				duration: Toast.durations.SHORT,
-			});
-
-			router.push("/(tabs)");
-		} else {
-			Toast.show("Invalid credentials", {
-				containerStyle: {
-					backgroundColor: "#ff0000",
-					width: "100%",
-				},
-				shadow: false,
-				duration: Toast.durations.LONG,
-			});
-		}
-	};
 
 	return (
-		<SafeAreaView style={loginStyles.container}>
-			<View style={loginStyles.logoContainer}>
+		<CustomBackground>
+			<View style={{ alignItems: "center" }}>
 				<Image
 					source={require("@/assets/images/logotransparent1.png")}
-					contentFit="contain"
-					style={{
-						width: 120,
-						height: 120,
-					}}
+					style={{ width: 150, height: 125 }}
 				/>
 			</View>
-
-			<View style={loginStyles.inputContainer}>
-				<TextInput
-					placeholder="Username"
-					placeholderTextColor="#999"
-					style={loginStyles.input}
-					keyboardType="default"
-					autoCapitalize="none"
-					onChangeText={(text) =>
-						setCredentials({ ...credentials, username: text })
-					}
+			<View style={{ marginTop: 40 }}>
+				<CustomButton
+					text="Log in"
+					onPress={() => router.push("/(stack)/new-login")} // Navigate to new-login.tsx
+					backgroundColor="#FFFFFF"
+					textColor="#D8BFD8"
 				/>
-				<TextInput
-					placeholder="Password"
-					placeholderTextColor="#999"
-					style={loginStyles.input}
-					secureTextEntry
-					onChangeText={(text) =>
-						setCredentials({ ...credentials, password: text })
-					}
+				<CustomButton
+					text="Register"
+					onPress={() => {
+						// Add navigation logic for register here
+					}}
+					backgroundColor="#D8BFD8"
+					textColor="#483D8B"
+					paddingHorizontal={90}
 				/>
-				<TouchableOpacity style={loginStyles.loginButton} onPress={handleLogin}>
-					<Text style={loginStyles.loginButtonText}>Log In</Text>
+			</View>
+			<View style={{ flexDirection: "row", marginTop: 20 }}>
+				<TouchableOpacity style={{ marginHorizontal: 10 }}>
+					<Image
+						source={{ uri: "https://img.icons8.com/color/50/000000/google-logo.png" }}
+						style={{ width: 40, height: 40 }}
+					/>
+				</TouchableOpacity>
+				<TouchableOpacity style={{ marginHorizontal: 10 }}>
+					<MaterialIcons name="phone" size={40} color="#D8BFD8" />
 				</TouchableOpacity>
 			</View>
-		</SafeAreaView>
+			<Text style={{ color: "#696969", marginTop: 10 }}>Don't have an account yet?</Text>
+		 </CustomBackground>
 	);
 }
-
-const loginStyles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
-		width: "100%",
-		backgroundColor: "#fff",
-	},
-	logoContainer: {
-		alignItems: "center",
-		marginTop: 60,
-		marginBottom: 10,
-	},
-	inputContainer: {
-		gap: 16,
-		marginBottom: 24,
-		padding: 20,
-		width: "100%",
-	},
-	input: {
-		borderWidth: 1,
-		borderColor: "#ddd",
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 16,
-		color: "#000",
-	},
-	loginButton: {
-		backgroundColor: "#7b45a6",
-		padding: 16,
-		borderRadius: 8,
-		alignItems: "center",
-	},
-	loginButtonText: {
-		color: "#fff",
-		fontSize: 16,
-		fontWeight: "600",
-	},
-});
