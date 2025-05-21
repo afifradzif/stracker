@@ -60,6 +60,7 @@ const StudyScreen = () => {
 			<Stack.Screen
 				options={{
 					title: "Study Plans",
+					headerShown: true,
 					headerBackVisible: true,
 				}}
 			/>

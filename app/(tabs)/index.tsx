@@ -58,7 +58,8 @@ export default function HomeScreen() {
 				<TouchableOpacity style={styles.floatingButton} onPress={handleAddButtonPress}>
 					<Text style={styles.floatingButtonText}>+</Text>
 				</TouchableOpacity>
-				<CustomBottomSheet ref={bottomSheetRef}>
+			</SafeAreaView>
+			<CustomBottomSheet ref={bottomSheetRef}>
 					<View style={styles.bottomSheetContent}>
 						<TouchableOpacity
 							style={styles.bottomSheetButton}
@@ -80,7 +81,6 @@ export default function HomeScreen() {
 						</TouchableOpacity>
 					</View>
 				</CustomBottomSheet>
-			</SafeAreaView>
 		</CustomBackground>
 	);
 }

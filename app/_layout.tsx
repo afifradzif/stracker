@@ -24,7 +24,6 @@ export default function RootLayout() {
 			} finally {
 				// Tell the application to render
 				setLoaded(true);
-				console.log(auth.isLoggedIn);
 			}
 		}
 
@@ -44,8 +43,7 @@ export default function RootLayout() {
 						<Redirect href="/(tabs)" />
 					) : (
 						<Redirect href="/(stack)/login" />
-					)}
-					{/* </Stack> */}
+						)}
 				</RootSiblingParent>
 			</BottomSheetModalProvider>
 		</GestureHandlerRootView>

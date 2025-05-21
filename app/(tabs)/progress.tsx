@@ -17,6 +17,7 @@ import {
 import { useCallback, useRef, useState } from "react";
 import { useTaskStore } from "@/hooks/use-task";
 import moment from "moment";
+import CustomBackground from "@/components/CustomBackground";
 
 export default function ProgressScreen() {
 	const router = useRouter();
@@ -55,157 +56,160 @@ export default function ProgressScreen() {
 	);
 
 	return (
-		<View
-			style={{
-				flex: 1,
-				justifyContent: "center",
-				alignItems: "center",
-				width: Dimensions.get("window").width,
-			}}
-		>
-			<Tabs.Screen
-				options={{
-					headerRight: () => (
-						<Link push style={{ marginRight: 16 }} href="/(stack)/add-tasks">
-							<AntDesign name="plus" size={24} color="black" />
-						</Link>
-					),
-				}}
-			/>
-			<ScrollView
-				style={{
-					width: "100%",
-					padding: 16,
-					marginBottom: 16,
-				}}
-			>
-				<View
+		<CustomBackground>
+				<Tabs.Screen
+					options={{
+						headerShown: true,
+						title: "Progress",
+						headerLeft: () => (
+							<TouchableOpacity
+								style={{ marginLeft: 16 }}
+								onPress={() => router.back()}
+							>
+								<AntDesign name="arrowleft" size={24} color="black" />
+							</TouchableOpacity>
+						),
+						headerRight: () => (
+							<Link push style={{ marginRight: 16 }} href="/(tabs)/tasks">
+								<AntDesign name="plus" size={24} color="black" />
+							</Link>
+						),
+					}}
+				/>
+				<ScrollView
 					style={{
-						display: "flex",
-						flexDirection: "column",
-						gap: 16,
+						width: "100%",
+						padding: 16,
+						marginBottom: 16,
 					}}
 				>
-					{tasks.length === 0 ? (
-						<Text
-							style={{
-								textAlign: "center",
-							}}
-						>
-							No progress available
-						</Text>
-					) : (
-						tasks.map((item) => (
-							<TouchableOpacity
-								key={item.id}
-								onPress={() => handlePresentModal(item.id)}
+					<View
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							gap: 16,
+						}}
+					>
+						{tasks.length === 0 ? (
+							<Text
 								style={{
-									backgroundColor: item.completed ? "#A8E6CF" : "#D6BBEA",
-									borderWidth: 1,
-									borderColor: item.completed ? "#3CB371" : "#7b45a6",
-									width: "100%",
-									position: "relative",
-									height: 100,
-									justifyContent: "center",
-									padding: 16,
-									borderRadius: 10,
-									opacity: item.completed ? 0.8 : 1,
+									textAlign: "center",
 								}}
 							>
-								<View
+								No progress available
+							</Text>
+						) : (
+							tasks.map((item) => (
+								<TouchableOpacity
+									key={item.id}
+									onPress={() => handlePresentModal(item.id)}
 									style={{
-										flexDirection: "row",
-										alignItems: "center",
-										gap: 12,
+										backgroundColor: item.completed ? "#A8E6CF" : "#D6BBEA",
+										borderWidth: 1,
+										borderColor: item.completed ? "#3CB371" : "#7b45a6",
+										width: "100%",
+										position: "relative",
+										height: 100,
+										justifyContent: "center",
+										padding: 16,
+										borderRadius: 10,
+										opacity: item.completed ? 0.8 : 1,
 									}}
 								>
-									<Text
+									<View
 										style={{
-											fontSize: 24,
-											fontWeight: "bold",
-											textDecorationLine: item.completed
-												? "line-through"
-												: "none",
-											color: item.completed ? "#666" : "#000",
+											flexDirection: "row",
+											alignItems: "center",
+											gap: 12,
 										}}
 									>
-										{item.title}
-									</Text>
-								</View>
-								<View
-									style={{
-										height: 10,
-									}}
-								/>
-								<View style={styles.progressBar}>
+										<Text
+											style={{
+												fontSize: 24,
+												fontWeight: "bold",
+												textDecorationLine: item.completed
+													? "line-through"
+													: "none",
+												color: item.completed ? "#666" : "#000",
+											}}
+										>
+											{item.title}
+										</Text>
+									</View>
 									<View
-										style={[
-											styles.progressFill,
-											{ width: `${item.progress * 100}%` },
-										]}
+										style={{
+											height: 10,
+										}}
 									/>
-								</View>
-								<Text
-									style={{
-										position: "absolute",
-										right: 5,
-										bottom: 5,
-									}}
-								>
-									{moment(item.due).format("D MMM YYYY, h:mm A")}
-								</Text>
-							</TouchableOpacity>
-						))
-					)}
-				</View>
-			</ScrollView>
-			<BottomSheetModal
-				ref={bottomSheetModalRef}
-				snapPoints={["25%"]}
-				enableDismissOnClose
-				backdropComponent={renderBackdrop}
-				enablePanDownToClose
-			>
-				<BottomSheetView
-					style={{
-						flex: 1,
-						padding: 16,
-					}}
+									<View style={styles.progressBar}>
+										<View
+											style={[
+												styles.progressFill,
+												{ width: `${item.progress * 100}%` },
+											]}
+										/>
+									</View>
+									<Text
+										style={{
+											position: "absolute",
+											right: 5,
+											bottom: 5,
+										}}
+									>
+										{moment(item.due).format("D MMM YYYY, h:mm A")}
+									</Text>
+								</TouchableOpacity>
+							))
+						)}
+					</View>
+				</ScrollView>
+				<BottomSheetModal
+					ref={bottomSheetModalRef}
+					snapPoints={["25%"]}
+					enableDismissOnClose
+					backdropComponent={renderBackdrop}
+					enablePanDownToClose
 				>
-					<TouchableOpacity
-						onPress={() =>
-							router.navigate(`/(stack)/update-progress/${selectedProgressId}`)
-						}
+					<BottomSheetView
 						style={{
-							flexDirection: "row",
-							alignItems: "center",
+							flex: 1,
 							padding: 16,
-							gap: 12,
-							borderBottomWidth: 1,
-							borderBottomColor: "#eee",
 						}}
 					>
-						<AntDesign name="edit" size={24} color="#3CB371" />
-						<Text style={{ fontSize: 16 }}>Edit</Text>
-					</TouchableOpacity>
+						<TouchableOpacity
+							onPress={() =>
+								router.navigate(`/(stack)/update-progress/${selectedProgressId}`)
+							}
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								padding: 16,
+								gap: 12,
+								borderBottomWidth: 1,
+								borderBottomColor: "#eee",
+							}}
+						>
+							<AntDesign name="edit" size={24} color="#3CB371" />
+							<Text style={{ fontSize: 16 }}>Edit</Text>
+						</TouchableOpacity>
 
-					<TouchableOpacity
-						onPress={handleDeleteProgress}
-						style={{
-							flexDirection: "row",
-							alignItems: "center",
-							padding: 16,
-							gap: 12,
-						}}
-					>
-						<MaterialIcons name="delete-outline" size={24} color="#ff4444" />
-						<Text style={{ fontSize: 16, color: "#ff4444" }}>
-							Delete Progress
-						</Text>
-					</TouchableOpacity>
-				</BottomSheetView>
-			</BottomSheetModal>
-		</View>
+						<TouchableOpacity
+							onPress={handleDeleteProgress}
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								padding: 16,
+								gap: 12,
+							}}
+						>
+							<MaterialIcons name="delete-outline" size={24} color="#ff4444" />
+							<Text style={{ fontSize: 16, color: "#ff4444" }}>
+								Delete Progress
+							</Text>
+						</TouchableOpacity>
+					</BottomSheetView>
+				</BottomSheetModal>
+		</CustomBackground>
 	);
 }
 

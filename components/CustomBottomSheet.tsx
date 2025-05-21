@@ -4,6 +4,7 @@ import {
 	BottomSheetView,
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
+	BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { StyleSheet } from "react-native";
 
@@ -14,7 +15,7 @@ interface CustomBottomSheetProps {
 }
 
 const CustomBottomSheet = forwardRef<BottomSheetModal, CustomBottomSheetProps>(
-	({ children, snapPoints = ["25%"], onClose }, ref) => {
+	({ children, onClose }, ref) => {
 		const renderBackdrop = useCallback(
 			(props: BottomSheetBackdropProps) => (
 				<BottomSheetBackdrop
@@ -22,26 +23,33 @@ const CustomBottomSheet = forwardRef<BottomSheetModal, CustomBottomSheetProps>(
 					opacity={0.5}
 					appearsOnIndex={0}
 					disappearsOnIndex={-1}
+					enableTouchThrough={false}
 				/>
 			),
 			[]
 		);
 
 		return (
-			<BottomSheetModal
-				ref={ref}
-				snapPoints={snapPoints}
-				backdropComponent={renderBackdrop}
-				enablePanDownToClose
-				onDismiss={onClose}
-			>
-				<BottomSheetView style={styles.contentContainer}>{children}</BottomSheetView>
-			</BottomSheetModal>
+			<BottomSheetModalProvider>
+				<BottomSheetModal
+					ref={ref}
+					backdropComponent={renderBackdrop}
+					enablePanDownToClose
+					onDismiss={onClose}
+					style={styles.modal} // Ensure it appears in front
+				>
+					<BottomSheetView style={styles.contentContainer}>{children}</BottomSheetView>
+				</BottomSheetModal>
+			</BottomSheetModalProvider>
 		);
 	}
 );
 
 const styles = StyleSheet.create({
+	modal: {
+		zIndex: 10000, // Ensure the modal appears in front of everything
+		elevation: 10, // Add elevation for Android
+	},
 	contentContainer: {
 		flex: 1,
 		padding: 16,
