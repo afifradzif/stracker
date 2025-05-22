@@ -5,21 +5,35 @@ import { MaterialIcons } from "@expo/vector-icons";
 import CustomButton from "@/components/CustomButton";
 import CustomBackground from "@/components/CustomBackground";
 import { MMKV } from "react-native-mmkv";
+import { useBiometrics } from "@/hooks/useBiometrics";
 
 const storage = new MMKV();
 
 export default function LoginScreen() {
 	const router = useRouter();
+	const { authenticate } = useBiometrics();
 
-	const handleLogin = () => {
-		const savedEmail = storage.getString("email");
-		const savedPassword = storage.getString("password");
+	const handleLogin = async () => {
+		try {
+			const biometricSuccess = await authenticate();
+			if (!biometricSuccess) {
+				Alert.alert("Authentication Failed", "Biometric authentication failed");
+				router.push("/(stack)/new-login");
+				return;
+			}
 
-		if (savedEmail && savedPassword) {
-			Alert.alert("Success", "Login successful!");
-			router.push("/(tabs)"); // Navigate to new-login.tsx
-		} else {
-			router.push("/(stack)/new-login");
+			const savedEmail = storage.getString("email");
+			const savedPassword = storage.getString("password");
+
+			if (savedEmail && savedPassword) {
+				Alert.alert("Success", "Login successful!");
+				router.push("/(tabs)");
+			} else {
+				router.push("/(stack)/new-login");
+			}
+		} catch (error) {
+			console.error("Login error:", error);
+			Alert.alert("Error", "Authentication failed");
 		}
 	};
 
