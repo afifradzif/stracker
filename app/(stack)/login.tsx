@@ -1,12 +1,27 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import CustomButton from "@/components/CustomButton";
 import CustomBackground from "@/components/CustomBackground";
+import { MMKV } from "react-native-mmkv";
+
+const storage = new MMKV();
 
 export default function LoginScreen() {
 	const router = useRouter();
+
+	const handleLogin = () => {
+		const savedEmail = storage.getString("email");
+		const savedPassword = storage.getString("password");
+
+		if (savedEmail && savedPassword) {
+			Alert.alert("Success", "Login successful!");
+			router.push("/(tabs)"); // Navigate to new-login.tsx
+		} else {
+			router.push("/(stack)/new-login");
+		}
+	};
 
 	return (
 		<CustomBackground>
@@ -19,15 +34,13 @@ export default function LoginScreen() {
 			<View style={{ marginTop: 40 }}>
 				<CustomButton
 					text="Log in"
-					onPress={() => router.push("/(stack)/new-login")} // Navigate to new-login.tsx
+					onPress={handleLogin} // Validate credentials
 					backgroundColor="#FFFFFF"
 					textColor="#D8BFD8"
 				/>
 				<CustomButton
 					text="Register"
-					onPress={() => {
-						// Add navigation logic for register here
-					}}
+					onPress={() => router.push("/(stack)/register")} // Navigate to register.tsx
 					backgroundColor="#D8BFD8"
 					textColor="#483D8B"
 					paddingHorizontal={90}
@@ -45,6 +58,6 @@ export default function LoginScreen() {
 				</TouchableOpacity>
 			</View>
 			<Text style={{ color: "#696969", marginTop: 10 }}>Don't have an account yet?</Text>
-		 </CustomBackground>
+		</CustomBackground>
 	);
 }
