@@ -2,6 +2,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Tabs, useRouter } from "expo-router";
 import { useAuthStore } from "@/hooks/use-auth";
 import { useTaskStore } from "@/hooks/use-task";
+import CustomBackground from "@/components/CustomBackground";
+import CustomBottomSheet from "@/components/CustomBottomSheet";
+import CustomButton from "@/components/CustomButton";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const ProfileScreen = () => {
 	const { signOut } = useAuthStore();
@@ -19,74 +23,34 @@ const ProfileScreen = () => {
 	};
 
 	return (
-		<View style={styles.container}>
+		<CustomBackground>
 			<Tabs.Screen
 				options={{
-					title: "Profile",
+					headerShown: true,
+					title: "Me",
+					headerLeft: () => (
+						<TouchableOpacity
+							style={{ marginLeft: 16 }}
+							onPress={() => router.back()}
+						>
+							<AntDesign name="arrowleft" size={24} color="black" />
+						</TouchableOpacity>
+					)
 				}}
 			/>
-			<View style={styles.header}>
-				<Image
-					source={{
-						uri: "https://i.pinimg.com/236x/6b/6e/26/6b6e26431100ff8c50c00c585293510d.jpg",
-					}}
-					style={styles.profilePicture}
-				/>
-				<Text style={styles.name}>John Doe</Text>
-			</View>
-			<View style={styles.content}>
-				<Text style={styles.label}>About</Text>
-				<Text style={styles.info}>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut risus
-					in augue luctus venenatis.
-				</Text>
-				<Text style={styles.label}>Contact</Text>
-				<Text style={styles.info}>
-					Email: example@email.com Phone: 123-456-7890
-				</Text>
-			</View>
-			<TouchableOpacity
+			<CustomButton
+				text={'Clear All Data'}
 				onPress={handleClearData}
-				style={{
-					padding: 16,
-					backgroundColor: "rgba(255, 0, 0, 0.6)",
-					borderWidth: 1,
-					borderColor: "rgba(255, 0, 0, 0.9)",
-					borderRadius: 8,
-				}}
-			>
-				<Text
-					style={{
-						color: "white",
-					}}
-				>
-					Clear All Data
-				</Text>
-			</TouchableOpacity>
-			<View
-				style={{
-					height: 16,
-				}}
+				backgroundColor="#3CB371"
+				textColor="#FFFFFF"
 			/>
-			<TouchableOpacity
+			<CustomButton
+				text={'Log Out'}
 				onPress={handleSignOut}
-				style={{
-					padding: 16,
-					backgroundColor: "rgba(255, 0, 0, 0.6)",
-					borderWidth: 1,
-					borderColor: "rgba(255, 0, 0, 0.9)",
-					borderRadius: 8,
-				}}
-			>
-				<Text
-					style={{
-						color: "white",
-					}}
-				>
-					Log Out
-				</Text>
-			</TouchableOpacity>
-		</View>
+				backgroundColor="#FF0000"
+				textColor="#FFFFFF"
+			/>
+		</CustomBackground>
 	);
 };
 

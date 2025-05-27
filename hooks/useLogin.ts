@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Alert } from "react-native";
+import { MMKV } from "react-native-mmkv";
+
+const storage = new MMKV();
 
 export function useLogin() {
 	const [credentials, setCredentials] = useState({
@@ -7,10 +10,14 @@ export function useLogin() {
 		password: "",
 	});
 
+	const savedEmail = storage.getString("email");
+	const savedPassword = storage.getString("password");
+
+
 	const handleLogin = (onSuccess: () => void, onError: () => void) => {
 		if (credentials.username && credentials.password) {
 			// Example logic: Replace with actual authentication logic
-			if (credentials.username === "admin" && credentials.password === "password") {
+			if (credentials.username === savedEmail && credentials.password === savedPassword) {
 				Alert.alert("Login Successful", "Welcome!");
 				onSuccess();
 			} else {
