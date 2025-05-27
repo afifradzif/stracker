@@ -6,10 +6,15 @@ import * as Font from "expo-font";
 import { useAuthStore } from "@/hooks/use-auth";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { registerForPushNotificationsAsync } from '../utils/notifications';
 
 export default function RootLayout() {
 	const [loaded, setLoaded] = useState(false);
 	const { auth } = useAuthStore();
+
+	  useEffect(() => {
+		registerForPushNotificationsAsync();
+	  }, []);
 
 	useEffect(() => {
 		async function prepare() {
