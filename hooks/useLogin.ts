@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { Alert } from "react-native";
-import { MMKV } from "react-native-mmkv";
-
-const storage = new MMKV();
+import { loginUser } from "@/lib/graphql/auth";
 
 export function useLogin() {
 	const [credentials, setCredentials] = useState({
@@ -10,22 +7,18 @@ export function useLogin() {
 		password: "",
 	});
 
-	const savedEmail = storage.getString("email");
-	const savedPassword = storage.getString("password");
+	const handleLogin = async (onSuccess: () => void, onError: () => void) => {
+		try {
+			const response = await loginUser(credentials.username, credentials.password);
 
-
-	const handleLogin = (onSuccess: () => void, onError: () => void) => {
-		if (credentials.username && credentials.password) {
-			// Example logic: Replace with actual authentication logic
-			if (credentials.username === savedEmail && credentials.password === savedPassword) {
-				Alert.alert("Login Successful", "Welcome!");
-				onSuccess();
-			} else {
-				Alert.alert("Login Failed", "Invalid username or password.");
+			if (response.error) {
 				onError();
+				return;
 			}
-		} else {
-			Alert.alert("Error", "Please enter both username and password.");
+
+			onSuccess();
+		} catch (error) {
+			onError();
 		}
 	};
 

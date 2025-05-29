@@ -1,27 +1,28 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import { registerUser } from "@/lib/graphql/auth";
 import CustomButton from "@/components/CustomButton";
-import { MMKV } from "react-native-mmkv";
 import CustomBackground from "@/components/CustomBackground";
 import CustomTextInput from "@/components/CustomTextInput";
 
-const storage = new MMKV();
-
 export default function RegisterScreen() {
-	const [email, setEmail] = useState("");
+	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const router = useRouter();
 
-	const handleRegister = () => {
-		if (!email || !password) {
+	const handleRegister = async () => {
+		if (!username || !password) {
 			Alert.alert("Error", "Please fill in all fields.");
 			return;
 		}
 
-		// Save credentials to MMKV
-		storage.set("email", email);
-		storage.set("password", password);
+		const response = await registerUser(username, password);
+
+		if (response.error) {
+			Alert.alert("Error", response.error);
+			return;
+		}
 
 		Alert.alert("Success", "Registration successful!");
 		router.push("/(stack)/login"); // Navigate back to login
@@ -32,9 +33,9 @@ export default function RegisterScreen() {
 			<View style={styles.container}>
 				<Text style={styles.title}>Register</Text>
 				<CustomTextInput
-					placeholder="Email/Username"
-					value={email}
-					onChangeText={setEmail}
+					placeholder="Username"
+					value={username}
+					onChangeText={setUsername}
 				/>
 				<CustomTextInput
 					placeholder="Password"

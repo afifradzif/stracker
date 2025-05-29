@@ -15,7 +15,7 @@ export default function NewLoginScreen() {
 	};
 
 	const onError = () => {
-		Alert.alert("Login Failed", "Invalid email/phone or password.");
+		Alert.alert("Login Failed", "Invalid username or password.");
 	};
 
 	return (
@@ -28,8 +28,7 @@ export default function NewLoginScreen() {
 					<CustomTextInput
 						value={credentials.username}
 						onChangeText={(text) => setCredentials({ ...credentials, username: text })}
-						placeholder="Email / Phone Number"
-						keyboardType="email-address"
+						placeholder="Username"
 						autoCapitalize="none"
 					/>
 					<CustomTextInput

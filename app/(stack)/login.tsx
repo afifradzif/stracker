@@ -6,35 +6,32 @@ import CustomButton from "@/components/CustomButton";
 import CustomBackground from "@/components/CustomBackground";
 import { MMKV } from "react-native-mmkv";
 import { useBiometrics } from "@/hooks/useBiometrics";
+import React, { useState } from "react";
+import { loginUser } from "@/lib/graphql/auth";
 
 const storage = new MMKV();
 
 export default function LoginScreen() {
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
 	const router = useRouter();
 	const { authenticate } = useBiometrics();
 
 	const handleLogin = async () => {
-		try {
-			const biometricSuccess = await authenticate();
-			if (!biometricSuccess) {
-				Alert.alert("Authentication Failed", "Biometric authentication failed");
-				router.push("/(stack)/new-login");
-				return;
-			}
-
-			const savedEmail = storage.getString("email");
-			const savedPassword = storage.getString("password");
-
-			if (savedEmail && savedPassword) {
-				Alert.alert("Success", "Login successful!");
-				router.push("/(tabs)");
-			} else {
-				router.push("/(stack)/new-login");
-			}
-		} catch (error) {
-			console.error("Login error:", error);
-			Alert.alert("Error", "Authentication failed");
+		if (!email || !password) {
+			Alert.alert("Error", "Please fill in all fields.");
+			return;
 		}
+
+		const response = await loginUser(email, password);
+
+		if (response.error) {
+			Alert.alert("Error", response.error);
+			return;
+		}
+
+		Alert.alert("Success", "Login successful!");
+		router.push("/(tabs)"); // Navigate to main app
 	};
 
 	return (
@@ -48,7 +45,8 @@ export default function LoginScreen() {
 			<View style={{ marginTop: 40 }}>
 				<CustomButton
 					text="Log in"
-					onPress={handleLogin} // Validate credentials
+					// onPress={(handleLogin)} // Validate credentials
+					onPress={() => router.push("/(stack)/new-login")} // Navigate to login.tsx
 					backgroundColor="#FFFFFF"
 					textColor="#D8BFD8"
 				/>
