@@ -1,6 +1,6 @@
 import { supabase } from '../supabase';
 import { AuthResponse } from './types';
-import * as Crypto from 'expo-crypto';
+import { setCurrentUserId } from '../store/session';
 
 export const registerUser = async (username: string, password: string): Promise<AuthResponse> => {
   try {
@@ -15,20 +15,17 @@ export const registerUser = async (username: string, password: string): Promise<
       throw new Error('Username already taken');
     }
 
-    // Insert new user without requiring auth
+    // Insert new user and let Supabase generate the UUID
     const { data, error } = await supabase
       .from('users')
-      .insert([
-        { 
-          username, 
-          password,
-          id: Crypto.randomUUID() // Generate a UUID for the user
-        }
-      ])
+      .insert([{ username, password }])
       .select()
       .single();
 
     if (error) throw error;
+
+    // Store user ID in session immediately after registration
+    setCurrentUserId(data.id);
 
     return {
       user: {
@@ -56,6 +53,9 @@ export const loginUser = async (username: string, password: string): Promise<Aut
       .single();
 
     if (error) throw new Error('Invalid username or password');
+
+    // Store user ID in session
+    setCurrentUserId(data.id);
 
     return {
       user: {

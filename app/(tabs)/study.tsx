@@ -34,7 +34,7 @@ export default function StudyPlanScreen() {
 		title: "",
 		date: new Date(),
 		reminder: "",
-		dailyMotivation: "",
+		daily_motivation: "", // Changed from dailyMotivation
 		completed: false,
 	});
 
@@ -310,13 +310,13 @@ export default function StudyPlanScreen() {
 								handleOpenDropdown(
 									dailyMotivationOptions,
 									"Select Daily Motivation",
-									selected.dailyMotivation,
-									(value) => setSelected({ ...selected, dailyMotivation: value })
+									selected.daily_motivation, // Changed from dailyMotivation
+									(value) => setSelected({ ...selected, daily_motivation: value }) // Changed from dailyMotivation
 								)
 							}
 						>
 							<Text style={{ fontSize: 16, color: "#666" }}>
-								{selected.dailyMotivation || "Select Daily Motivation"}
+								{selected.daily_motivation || "Select Daily Motivation"} {/* Changed from dailyMotivation */}
 							</Text>
 						</TouchableOpacity>
 						<CustomButton

@@ -1,64 +1,53 @@
-import { create } from "zustand";
-import {
-	createJSONStorage,
-	persist,
-	type StateStorage,
-} from "zustand/middleware";
-import { MMKV } from "react-native-mmkv";
-import type { TStudy } from "@/types/study.types";
+import { useState, useEffect } from "react";
+import { StudyPlan } from "@/lib/graphql/types";
+import * as studyAPI from "@/lib/graphql/study";
 
-const mmkv = new MMKV({
-	id: "study-store",
-});
+export const useStudyPlan = () => {
+	const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
 
-const mmkvStorage: StateStorage = {
-	setItem: (name, value) => {
-		return mmkv.set(name, value);
-	},
-	getItem: (name) => {
-		const value = mmkv.getString(name);
-		return value ?? null;
-	},
-	removeItem: (name) => {
-		return mmkv.delete(name);
-	},
+	useEffect(() => {
+		loadStudyPlans();
+	}, []);
+
+	const loadStudyPlans = async () => {
+		try {
+			const plans = await studyAPI.getStudyPlans();
+			setStudyPlans(plans);
+		} catch (error) {
+			console.error("Error loading study plans:", error);
+		}
+	};
+
+	const addStudyPlan = async (plan: Omit<StudyPlan, "user_id" | "created_at">) => {
+		try {
+			const newPlan = await studyAPI.addStudyPlan(plan);
+			setStudyPlans([...studyPlans, newPlan]);
+		} catch (error) {
+			console.error("Error adding study plan:", error);
+		}
+	};
+
+	const setCompleted = async (id: string, completed: boolean) => {
+		try {
+			await studyAPI.updateStudyPlan(id, completed);
+			setStudyPlans(
+				studyPlans.map((plan) =>
+					plan.id === id ? { ...plan, completed } : plan,
+				),
+			);
+		} catch (error) {
+			console.error("Error updating study plan:", error);
+		}
+	};
+
+	const removeStudyPlan = async (id: string) => {
+		try {
+			await studyAPI.deleteStudyPlan(id);
+			setStudyPlans(studyPlans.filter((plan) => plan.id !== id));
+		} catch (error) {
+			console.error("Error removing study plan:", error);
+		}
+	};
+
+	return { studyPlans, addStudyPlan, setCompleted, removeStudyPlan };
 };
-
-interface StudyPlanStore {
-	studyPlans: TStudy[];
-	addStudyPlan: (studyPlans: TStudy) => void;
-	updateStudyPlan: (id: string, task: TStudy) => void;
-	setCompleted: (id: string, completed: boolean) => void;
-	removeStudyPlan: (id: string) => void;
-	clearStudyPlan: () => void;
-}
-
-export const useStudyPlan = create(
-	persist<StudyPlanStore>(
-		(set, get) => ({
-			studyPlans: [],
-			addStudyPlan: (task) => set({ studyPlans: [...get().studyPlans, task] }),
-			setCompleted: (id, completed) => {
-				const currentTasks = get().studyPlans;
-				const updatedTasks = currentTasks.map((task) =>
-					task.id === id
-						? { ...task, completed, progress: !completed ? 0 : 100 }
-						: task,
-				);
-				set({ studyPlans: updatedTasks });
-			},
-			updateStudyPlan: (id, task) => {
-				const currentTasks = get().studyPlans;
-				const updatedTasks = currentTasks.map((t) => (t.id === id ? task : t));
-				set({ studyPlans: updatedTasks });
-			},
-			removeStudyPlan: (id) =>
-				set({ studyPlans: get().studyPlans.filter((task) => task.id !== id) }),
-			clearStudyPlan: () => set({ studyPlans: [] }),
-		}),
-		{
-			name: "task-store",
-			storage: createJSONStorage(() => mmkvStorage),
-		},
-	),
-);
