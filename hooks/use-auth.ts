@@ -1,16 +1,13 @@
 import { create } from "zustand";
-import {
-	createJSONStorage,
-	persist,
-	type StateStorage,
-} from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { loginUser } from "@/lib/graphql/auth";
 import { MMKV } from "react-native-mmkv";
 
 const mmkv = new MMKV({
 	id: "auth-store",
 });
 
-const mmkvStorage: StateStorage = {
+const mmkvStorage = {
 	setItem: (name, value) => {
 		return mmkv.set(name, value);
 	},
@@ -24,36 +21,42 @@ const mmkvStorage: StateStorage = {
 };
 
 interface Auth {
-	username: string;
-	password: string;
 	isLoggedIn: boolean;
+	userId?: string;
 }
 
 interface AuthStore {
 	auth: Auth;
-	signIn: (credentials: Pick<Auth, "username" | "password">) => boolean;
+	signIn: (credentials: { username: string; password: string }) => Promise<boolean>;
 	signOut: () => void;
 }
 
 export const useAuthStore = create(
 	persist<AuthStore>(
-		(set, get) => ({
+		(set) => ({
 			auth: {
-				username: "admin",
-				password: "admin",
 				isLoggedIn: false,
+				userId: undefined,
 			},
-			signIn: (credentials) => {
-				if (
-					credentials.username === "admin" &&
-					credentials.password === "admin"
-				) {
-					set({ auth: { ...credentials, isLoggedIn: true } });
-					return true;
+			signIn: async (credentials) => {
+				const response = await loginUser(credentials.username, credentials.password);
+				if (response.error) {
+					return false;
 				}
-				return false;
+				set({ 
+					auth: { 
+						isLoggedIn: true,
+						userId: response.user?.id 
+					} 
+				});
+				return true;
 			},
-			signOut: () => set({ auth: { ...get().auth, isLoggedIn: false } }),
+			signOut: () => set({ 
+				auth: { 
+					isLoggedIn: false,
+					userId: undefined 
+				} 
+			}),
 		}),
 		{
 			name: "auth-store",

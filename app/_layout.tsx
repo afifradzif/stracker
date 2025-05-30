@@ -44,11 +44,7 @@ export default function RootLayout() {
 			<BottomSheetModalProvider>
 				<RootSiblingParent>
 					<Slot />
-					{auth.isLoggedIn ? (
-						<Redirect href="/(tabs)" />
-					) : (
 						<Redirect href="/(stack)/login" />
-						)}
 				</RootSiblingParent>
 			</BottomSheetModalProvider>
 		</GestureHandlerRootView>

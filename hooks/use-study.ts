@@ -53,5 +53,21 @@ export const useStudyPlan = () => {
 		}
 	};
 
-	return { studyPlans, addStudyPlan, setCompleted, removeStudyPlan };
+	const removeAllStudyPlans = async () => {
+		try {
+			await studyAPI.removeAllStudyPlans();
+			setStudyPlans([]);
+		} catch (error) {
+			console.error("Error removing all study plans:", error);
+		}
+	};
+
+	return {
+		studyPlans,
+		addStudyPlan,
+		setCompleted,
+		removeStudyPlan,
+		removeAllStudyPlans,
+		loadStudyPlans,
+	};
 };

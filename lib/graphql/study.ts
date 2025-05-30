@@ -58,3 +58,15 @@ export const deleteStudyPlan = async (id: string): Promise<void> => {
 
   if (error) throw error;
 };
+
+export const removeAllStudyPlans = async (): Promise<void> => {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('User not logged in');
+
+  const { error } = await supabase
+    .from('study_plans')
+    .delete()
+    .eq('user_id', userId);
+
+  if (error) throw error;
+};

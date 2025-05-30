@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
-import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useRef, useCallback } from "react";
 import CustomBackground from "@/components/CustomBackground";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -13,8 +13,8 @@ import { useStudyPlan } from "@/hooks/use-study";
 export default function HomeScreen() {
 	const router = useRouter();
 	const bottomSheetRef = useRef(null);
-	const { tasks } = useTaskStore();
-	const { studyPlans } = useStudyPlan();
+	const { tasks, loadTasks } = useTaskStore();
+	const { studyPlans, loadStudyPlans } = useStudyPlan();
 
 	const handleAddButtonPress = () => {
 		bottomSheetRef.current?.present();
@@ -24,6 +24,14 @@ export default function HomeScreen() {
 	const upcomingStudyPlans = studyPlans
 		.filter(p => new Date(p.date) > new Date())
 		.slice(0, 3);
+
+	// Refresh data when screen comes into focus
+	useFocusEffect(
+		useCallback(() => {
+			loadTasks();
+			loadStudyPlans();
+		}, [])
+	);
 
 	return (
 		<CustomBackground>

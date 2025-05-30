@@ -8,6 +8,7 @@ export const useTaskStore = () => {
 	const { auth } = useAuthStore();
 
 	useEffect(() => {
+		console.log("auth.isLoggedIn",auth.isLoggedIn)
 		if (auth.isLoggedIn) {
 			loadTasks();
 		}
@@ -79,6 +80,15 @@ export const useTaskStore = () => {
 		}
 	};
 
+	const removeAllTasks = async () => {
+		try {
+			await taskAPI.removeAllTasks();
+			setTasks([]);
+		} catch (error) {
+			console.error('Error removing all tasks:', error);
+		}
+	};
+
 	return {
 		tasks,
 		addTask,
@@ -86,5 +96,7 @@ export const useTaskStore = () => {
 		removeTask,
 		updateProgress,
 		updateTask,
+		removeAllTasks,
+		loadTasks,
 	};
 };

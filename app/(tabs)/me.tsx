@@ -9,11 +9,15 @@ import { useState, useEffect } from "react";
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from '@/utils/notifications';
 import { removeNotificationToken, saveNotificationToken } from '@/lib/notifications';
+import { useTaskStore } from '@/hooks/use-task';
+import { useStudyPlan } from '@/hooks/use-study';
 
 const ProfileScreen = () => {
 	const { signOut } = useAuthStore();
 	const router = useRouter();
 	const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+	const { removeAllTasks } = useTaskStore();
+	const { removeAllStudyPlans } = useStudyPlan();
 
 	useEffect(() => {
 		checkNotificationPermissions();
@@ -54,6 +58,33 @@ const ProfileScreen = () => {
 	const handleSignOut = () => {
 		signOut();
 		router.navigate("/(stack)/login");
+	};
+
+	const handleClearAllData = () => {
+		Alert.alert(
+			'Clear All Data',
+			'Are you sure you want to remove all your tasks, study plans, and progress? This action cannot be undone.',
+			[
+				{
+					text: 'Cancel',
+					style: 'cancel',
+				},
+				{
+					text: 'Clear All',
+					style: 'destructive',
+					onPress: async () => {
+						try {
+							await removeAllTasks();
+							await removeAllStudyPlans();
+							router.replace('/(tabs)'); // Replace instead of push to refresh the stats
+							Alert.alert('Success', 'All data has been cleared.');
+						} catch (error) {
+							Alert.alert('Error', 'Failed to clear data.');
+						}
+					},
+				},
+			]
+		);
 	};
 
 	return (
@@ -106,6 +137,14 @@ const ProfileScreen = () => {
 				>
 					<Text style={styles.menuText}>Help & Support</Text>
 					<AntDesign name="right" size={20} color="#666" />
+				</TouchableOpacity>
+
+				<TouchableOpacity 
+					style={[styles.menuItem]}
+					onPress={handleClearAllData}
+				>
+					<Text style={[styles.menuText]}>Clear All Data</Text>
+					<AntDesign name="delete" size={20} color="#FF0000" />
 				</TouchableOpacity>
 			</View>
 			

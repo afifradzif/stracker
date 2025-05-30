@@ -65,3 +65,15 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<vo
 
   if (error) throw error;
 };
+
+export const removeAllTasks = async (): Promise<void> => {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('User not logged in');
+
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('user_id', userId);
+
+  if (error) throw error;
+};
