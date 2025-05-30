@@ -7,17 +7,19 @@ import CustomBackground from "@/components/CustomBackground";
 import CustomTextInput from "@/components/CustomTextInput";
 
 export default function RegisterScreen() {
+	const [name, setName] = useState("");
 	const [username, setUsername] = useState("");
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const router = useRouter();
 
 	const handleRegister = async () => {
-		if (!username || !password) {
+		if (!username || !password || !name || !email) {
 			Alert.alert("Error", "Please fill in all fields.");
 			return;
 		}
 
-		const response = await registerUser(username, password);
+		const response = await registerUser(username, password, name, email);
 
 		if (response.error) {
 			Alert.alert("Error", response.error);
@@ -33,9 +35,21 @@ export default function RegisterScreen() {
 			<View style={styles.container}>
 				<Text style={styles.title}>Register</Text>
 				<CustomTextInput
+					placeholder="Full Name"
+					value={name}
+					onChangeText={setName}
+				/>
+				<CustomTextInput
 					placeholder="Username"
 					value={username}
 					onChangeText={setUsername}
+				/>
+				<CustomTextInput
+					placeholder="Email"
+					value={email}
+					onChangeText={setEmail}
+					keyboardType="email-address"
+					autoCapitalize="none"
 				/>
 				<CustomTextInput
 					placeholder="Password"

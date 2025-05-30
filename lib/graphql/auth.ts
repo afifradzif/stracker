@@ -1,24 +1,40 @@
 import { supabase } from '../supabase';
 import { AuthResponse } from './types';
 import { setCurrentUserId } from '../store/session';
+import { setCurrentUserName } from '../store/user';
 
-export const registerUser = async (username: string, password: string): Promise<AuthResponse> => {
+export const registerUser = async (
+  username: string, 
+  password: string,
+  name: string,
+  email: string
+): Promise<AuthResponse> => {
   try {
-    // First check if username exists
+    // Check if username or email exists
     const { data: existingUser } = await supabase
       .from('users')
-      .select('username')
-      .eq('username', username)
+      .select('username, email')
+      .or(`username.eq.${username},email.eq.${email}`)
       .single();
 
     if (existingUser) {
-      throw new Error('Username already taken');
+      if (existingUser.username === username) {
+        throw new Error('Username already taken');
+      }
+      if (existingUser.email === email) {
+        throw new Error('Email already registered');
+      }
     }
 
     // Insert new user and let Supabase generate the UUID
     const { data, error } = await supabase
       .from('users')
-      .insert([{ username, password }])
+      .insert([{ 
+        username, 
+        password,
+        name,
+        email 
+      }])
       .select()
       .single();
 
@@ -47,20 +63,22 @@ export const loginUser = async (username: string, password: string): Promise<Aut
   try {
     const { data, error } = await supabase
       .from('users')
-      .select()
+      .select('*')
       .eq('username', username)
       .eq('password', password)
       .single();
 
     if (error) throw new Error('Invalid username or password');
 
-    // Store user ID in session
+    // Store user ID and name in session
     setCurrentUserId(data.id);
+    setCurrentUserName(data.name);
 
     return {
       user: {
         id: data.id,
         username: data.username,
+        name: data.name,
         created_at: data.created_at
       },
       error: null

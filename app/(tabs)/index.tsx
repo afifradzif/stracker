@@ -6,6 +6,7 @@ import CustomBottomSheet from "@/components/CustomBottomSheet";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { getCurrentUserName } from '@/lib/store/user';
 
 export default function HomeScreen() {
 	const router = useRouter();
@@ -19,7 +20,7 @@ export default function HomeScreen() {
 		<CustomBackground>
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.header}>
-					<Text style={styles.headerText}>Hello, Admin</Text>
+					<Text style={styles.headerText}>Hello, {getCurrentUserName()}</Text>
 				</View>
 				<View style={styles.menuContainer}>
 					<TouchableOpacity

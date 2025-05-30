@@ -19,3 +19,14 @@ export type StudyPlan = {
   completed: boolean;
   created_at: string;
 };
+
+export type Task = {
+  id: string;
+  user_id: string;
+  title: string;
+  due: Date;
+  reminder: string;
+  completed: boolean;
+  progress: number;
+  created_at: string;
+};

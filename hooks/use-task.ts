@@ -1,64 +1,86 @@
-import { create } from "zustand";
-import {
-	createJSONStorage,
-	persist,
-	type StateStorage,
-} from "zustand/middleware";
-import type { TTask } from "@/types/task.types";
-import { MMKV } from "react-native-mmkv";
+import { useState, useEffect } from "react";
+import { Task } from "@/lib/graphql/types";
+import * as taskAPI from "@/lib/graphql/task";
 
-const mmkv = new MMKV({
-	id: "task-store",
-});
+export const useTaskStore = () => {
+	const [tasks, setTasks] = useState<Task[]>([]);
 
-const mmkvStorage: StateStorage = {
-	setItem: (name, value) => {
-		return mmkv.set(name, value);
-	},
-	getItem: (name) => {
-		const value = mmkv.getString(name);
-		return value ?? null;
-	},
-	removeItem: (name) => {
-		return mmkv.delete(name);
-	},
+	useEffect(() => {
+		loadTasks();
+	}, []);
+
+	const loadTasks = async () => {
+		try {
+			const data = await taskAPI.getTasks();
+			setTasks(data);
+		} catch (error) {
+			console.error("Error loading tasks:", error);
+		}
+	};
+
+	const addTask = async (task: Omit<Task, "user_id" | "created_at">) => {
+		try {
+			const newTask = await taskAPI.addTask(task);
+			setTasks([...tasks, newTask]);
+		} catch (error) {
+			console.error("Error adding task:", error);
+		}
+	};
+
+	const setCompleted = async (id: string, completed: boolean) => {
+		try {
+			await taskAPI.updateTaskStatus(id, completed);
+			setTasks(
+				tasks.map((task) =>
+					task.id === id ? { ...task, completed } : task,
+				),
+			);
+		} catch (error) {
+			console.error("Error updating task:", error);
+		}
+	};
+
+	const removeTask = async (id: string) => {
+		try {
+			await taskAPI.deleteTask(id);
+			setTasks(tasks.filter((task) => task.id !== id));
+		} catch (error) {
+			console.error("Error removing task:", error);
+		}
+	};
+
+	const updateProgress = async (id: string, progress: number) => {
+		try {
+			await taskAPI.updateTaskProgress(id, progress);
+			setTasks(
+				tasks.map((task) =>
+					task.id === id ? { ...task, progress } : task,
+				),
+			);
+		} catch (error) {
+			console.error("Error updating task progress:", error);
+		}
+	};
+
+	const updateTask = async (id: string, updates: Partial<Task>) => {
+		try {
+			await taskAPI.updateTask(id, updates);
+			setTasks(
+				tasks.map((task) =>
+					task.id === id ? { ...task, ...updates } : task,
+				),
+			);
+		} catch (error) {
+			console.error("Error updating task:", error);
+		}
+	};
+
+	return {
+		tasks,
+		addTask,
+		setCompleted,
+		removeTask,
+		updateProgress,
+		updateTask,
+	};
 };
-
-interface TaskStore {
-	tasks: TTask[];
-	addTask: (tasks: TTask) => void;
-	updateTask: (id: string, task: TTask) => void;
-	setCompleted: (id: string, completed: boolean) => void;
-	removeTask: (id: string) => void;
-	clearTasks: () => void;
-}
-
-export const useTaskStore = create(
-	persist<TaskStore>(
-		(set, get) => ({
-			tasks: [],
-			addTask: (task) => set({ tasks: [...get().tasks, task] }),
-			setCompleted: (id, completed) => {
-				const currentTasks = get().tasks;
-				const updatedTasks = currentTasks.map((task) =>
-					task.id === id
-						? { ...task, completed, progress: !completed ? 0 : 100 }
-						: task,
-				);
-				set({ tasks: updatedTasks });
-			},
-			updateTask: (id, task) => {
-				const currentTasks = get().tasks;
-				const updatedTasks = currentTasks.map((t) => (t.id === id ? task : t));
-				set({ tasks: updatedTasks });
-			},
-			removeTask: (id) =>
-				set({ tasks: get().tasks.filter((task) => task.id !== id) }),
-			clearTasks: () => set({ tasks: [] }),
-		}),
-		{
-			name: "task-store",
-			storage: createJSONStorage(() => mmkvStorage),
-		},
-	),
-);

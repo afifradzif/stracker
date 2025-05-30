@@ -21,7 +21,7 @@ import CustomBackground from "@/components/CustomBackground";
 
 export default function ProgressScreen() {
 	const router = useRouter();
-	const { tasks, removeTask } = useTaskStore();
+	const { tasks, removeTask, updateProgress, updateTask } = useTaskStore();
 	const [selectedProgressId, setSelectedProgressId] = useState<string | null>(
 		null,
 	);
@@ -41,6 +41,14 @@ export default function ProgressScreen() {
 		}
 		bottomSheetModalRef.current?.dismiss();
 	}, [selectedProgressId, removeTask]);
+
+	const handleUpdateProgress = async (id: string, progress: number) => {
+		try {
+			await updateProgress(id, progress);
+		} catch (error) {
+			console.error("Error updating progress:", error);
+		}
+	};
 
 	const renderBackdrop = useCallback(
 		(props: BottomSheetBackdropProps) => (
