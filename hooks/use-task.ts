@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { Task } from "@/lib/graphql/types";
 import * as taskAPI from "@/lib/graphql/task";
+import { useAuthStore } from "./use-auth";
 
 export const useTaskStore = () => {
 	const [tasks, setTasks] = useState<Task[]>([]);
+	const { auth } = useAuthStore();
 
 	useEffect(() => {
-		loadTasks();
-	}, []);
+		if (auth.isLoggedIn) {
+			loadTasks();
+		}
+	}, [auth.isLoggedIn]);
 
 	const loadTasks = async () => {
 		try {

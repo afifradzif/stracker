@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { StudyPlan } from "@/lib/graphql/types";
 import * as studyAPI from "@/lib/graphql/study";
+import { useAuthStore } from "./use-auth";
 
 export const useStudyPlan = () => {
 	const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+	const { auth } = useAuthStore();
 
 	useEffect(() => {
-		loadStudyPlans();
-	}, []);
+		if (auth.isLoggedIn) {
+			loadStudyPlans();
+		}
+	}, [auth.isLoggedIn]);
 
 	const loadStudyPlans = async () => {
 		try {
