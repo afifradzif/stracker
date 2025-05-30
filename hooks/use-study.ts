@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { StudyPlan } from "@/lib/graphql/types";
 import * as studyAPI from "@/lib/graphql/study";
 import { useAuthStore } from "./use-auth";
+import { schedulePushNotification, calculateReminderDate, setupDailyMotivation } from '@/utils/notifications';
 
 export const useStudyPlan = () => {
 	const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
@@ -26,6 +27,21 @@ export const useStudyPlan = () => {
 		try {
 			const newPlan = await studyAPI.addStudyPlan(plan);
 			setStudyPlans([...studyPlans, newPlan]);
+
+			// Schedule reminder notification
+			if (plan.reminder) {
+				const reminderDate = calculateReminderDate(plan.date, plan.reminder);
+				await schedulePushNotification({
+					title: `Study Plan Reminder: ${plan.title}`,
+					body: `Time to study! Your study plan is ${plan.reminder === 'Everyday' ? 'scheduled' : 'coming up'}`,
+					trigger: reminderDate,
+				});
+			}
+
+			// Setup daily motivation if selected
+			if (plan.daily_motivation) {
+				await setupDailyMotivation(plan.daily_motivation, plan.title);
+			}
 		} catch (error) {
 			console.error("Error adding study plan:", error);
 		}

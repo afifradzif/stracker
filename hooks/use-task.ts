@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Task } from "@/lib/graphql/types";
 import * as taskAPI from "@/lib/graphql/task";
 import { useAuthStore } from "./use-auth";
+import { schedulePushNotification, calculateReminderDate } from '@/utils/notifications';
 
 export const useTaskStore = () => {
 	const [tasks, setTasks] = useState<Task[]>([]);
@@ -27,6 +28,16 @@ export const useTaskStore = () => {
 		try {
 			const newTask = await taskAPI.addTask(task);
 			setTasks([...tasks, newTask]);
+
+			// Schedule reminder notification
+			if (task.reminder) {
+				const reminderDate = calculateReminderDate(task.due, task.reminder);
+				await schedulePushNotification({
+					title: `Task Reminder: ${task.title}`,
+					body: `Your task is ${task.reminder === 'Everyday' ? 'ongoing' : 'due soon'}!`,
+					trigger: reminderDate,
+				});
+			}
 		} catch (error) {
 			console.error("Error adding task:", error);
 		}
