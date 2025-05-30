@@ -7,21 +7,65 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { getCurrentUserName } from '@/lib/store/user';
+import { useTaskStore } from "@/hooks/use-task";
+import { useStudyPlan } from "@/hooks/use-study";
 
 export default function HomeScreen() {
 	const router = useRouter();
 	const bottomSheetRef = useRef(null);
+	const { tasks } = useTaskStore();
+	const { studyPlans } = useStudyPlan();
 
 	const handleAddButtonPress = () => {
 		bottomSheetRef.current?.present();
 	};
+
+	const completedTasks = tasks.filter(t => t.completed).length;
+	const upcomingStudyPlans = studyPlans
+		.filter(p => new Date(p.date) > new Date())
+		.slice(0, 3);
 
 	return (
 		<CustomBackground>
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.header}>
 					<Text style={styles.headerText}>Hello, {getCurrentUserName()}</Text>
+					<Text style={styles.dateText}>{new Date().toLocaleDateString()}</Text>
 				</View>
+
+				<View style={styles.statsContainer}>
+					<View style={styles.statCard}>
+						<Text style={styles.statNumber}>{tasks.length}</Text>
+						<Text style={styles.statLabel}>Total Tasks</Text>
+					</View>
+					<View style={styles.statCard}>
+						<Text style={styles.statNumber}>{completedTasks}</Text>
+						<Text style={styles.statLabel}>Completed</Text>
+					</View>
+					<View style={styles.statCard}>
+						<Text style={styles.statNumber}>{studyPlans.length}</Text>
+						<Text style={styles.statLabel}>Study Plans</Text>
+					</View>
+				</View>
+
+				{upcomingStudyPlans.length > 0 && (
+					<View style={styles.upcomingContainer}>
+						<Text style={styles.sectionTitle}>Upcoming Study Plans</Text>
+						{upcomingStudyPlans.map(plan => (
+							<TouchableOpacity 
+								key={plan.id}
+								style={styles.upcomingItem}
+								onPress={() => router.push("/(tabs)/study")}
+							>
+								<Text style={styles.upcomingTitle}>{plan.title}</Text>
+								<Text style={styles.upcomingDate}>
+									{new Date(plan.date).toLocaleDateString()}
+								</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				)}
+
 				<View style={styles.menuContainer}>
 					<TouchableOpacity
 						style={styles.menuCard}
@@ -98,6 +142,65 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "#333",
 	},
+	dateText: {
+		fontSize: 14,
+		color: "#666",
+		marginTop: 4,
+	},
+	statsContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		marginVertical: 20,
+		paddingHorizontal: 10,
+	},
+	statCard: {
+		backgroundColor: '#fff',
+		borderRadius: 10,
+		padding: 15,
+		alignItems: 'center',
+		elevation: 3,
+		width: '30%',
+	},
+	statNumber: {
+		fontSize: 24,
+		fontWeight: 'bold',
+		color: '#7b45a6',
+	},
+	statLabel: {
+		fontSize: 12,
+		color: '#666',
+		marginTop: 4,
+	},
+	upcomingContainer: {
+		backgroundColor: '#fff',
+		borderRadius: 10,
+		padding: 15,
+		marginHorizontal: 10,
+		marginBottom: 20,
+		elevation: 3,
+	},
+	sectionTitle: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginBottom: 10,
+		color: '#333',
+	},
+	upcomingItem: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		paddingVertical: 8,
+		borderBottomWidth: 1,
+		borderBottomColor: '#eee',
+	},
+	upcomingTitle: {
+		fontSize: 14,
+		color: '#333',
+	},
+	upcomingDate: {
+		fontSize: 12,
+		color: '#666',
+	},
 	menuContainer: {
 		flexDirection: "row",
 		backgroundColor: "#F5F5F5",
@@ -106,11 +209,15 @@ const styles = StyleSheet.create({
 		height: 100,
 		marginTop: 10,
 		elevation: 3,
+		justifyContent: "center",
+		alignItems: "center",
+		gap: 20,
 	},
 	menuCard: {
 		width: 80,
 		justifyContent: "center",
 		alignItems: "center",
+		flex: 1,
 	},
 	menuText: {
 		marginTop: 8,
