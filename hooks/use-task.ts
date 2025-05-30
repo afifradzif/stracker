@@ -9,7 +9,7 @@ export const useTaskStore = () => {
 	const { auth } = useAuthStore();
 
 	useEffect(() => {
-		console.log("auth.isLoggedIn",auth.isLoggedIn)
+		console.log("auth.isLoggedIn use-task",auth.isLoggedIn)
 		if (auth.isLoggedIn) {
 			loadTasks();
 		}

@@ -9,12 +9,14 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { getCurrentUserName } from '@/lib/store/user';
 import { useTaskStore } from "@/hooks/use-task";
 import { useStudyPlan } from "@/hooks/use-study";
+import { useAuthStore } from "@/hooks/use-auth";
 
 export default function HomeScreen() {
 	const router = useRouter();
 	const bottomSheetRef = useRef(null);
 	const { tasks, loadTasks } = useTaskStore();
 	const { studyPlans, loadStudyPlans } = useStudyPlan();
+	const { auth } = useAuthStore();
 
 	const handleAddButtonPress = () => {
 		bottomSheetRef.current?.present();
@@ -28,8 +30,10 @@ export default function HomeScreen() {
 	// Refresh data when screen comes into focus
 	useFocusEffect(
 		useCallback(() => {
-			loadTasks();
-			loadStudyPlans();
+			if (auth.isLoggedIn) {
+				loadTasks();
+				loadStudyPlans();
+			}
 		}, [])
 	);
 

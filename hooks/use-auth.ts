@@ -40,13 +40,11 @@ export const useAuthStore = create(
 			},
 			signIn: async (credentials) => {
 				const response = await loginUser(credentials.username, credentials.password);
-				if (response.error) {
-					return false;
-				}
+				if (response.error) return false;
 				set({ 
 					auth: { 
 						isLoggedIn: true,
-						userId: response.user?.id 
+						userId: response.user?.id
 					} 
 				});
 				return true;
@@ -54,9 +52,10 @@ export const useAuthStore = create(
 			signOut: () => set({ 
 				auth: { 
 					isLoggedIn: false,
-					userId: undefined 
+					userId: undefined
 				} 
 			}),
+
 		}),
 		{
 			name: "auth-store",

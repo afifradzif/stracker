@@ -9,6 +9,7 @@ export const useStudyPlan = () => {
 	const { auth } = useAuthStore();
 
 	useEffect(() => {
+		console.log("auth.isLoggedIn use-study",auth.isLoggedIn)
 		if (auth.isLoggedIn) {
 			loadStudyPlans();
 		}
