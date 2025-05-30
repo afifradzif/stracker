@@ -5,13 +5,51 @@ import CustomBackground from "@/components/CustomBackground";
 import CustomButton from "@/components/CustomButton";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { getCurrentUserName } from '@/lib/store/user';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as Notifications from 'expo-notifications';
+import { registerForPushNotificationsAsync } from '@/utils/notifications';
+import { removeNotificationToken, saveNotificationToken } from '@/lib/notifications';
 
 const ProfileScreen = () => {
 	const { signOut } = useAuthStore();
 	const router = useRouter();
-	const [darkMode, setDarkMode] = useState(false);
-	const [notifications, setNotifications] = useState(true);
+	const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+	useEffect(() => {
+		checkNotificationPermissions();
+	}, []);
+
+	const checkNotificationPermissions = async () => {
+		const { status } = await Notifications.getPermissionsAsync();
+		setNotificationsEnabled(status === 'granted');
+	};
+
+	const handleNotificationToggle = async (value: boolean) => {
+		if (value) {
+			const token = await registerForPushNotificationsAsync();
+			if (token) {
+				setNotificationsEnabled(true);
+				await saveNotificationToken(token);
+			} else {
+				Alert.alert(
+					'Permission Required',
+					'Please enable notifications in your device settings.'
+				);
+				setNotificationsEnabled(false);
+			}
+		} else {
+			setNotificationsEnabled(false);
+			// await Notifications.setNotificationHandler({
+			// 	handleNotification: async () => ({
+			// 		shouldShowAlert: false,
+			// 		shouldPlaySound: false,
+			// 		shouldSetBadge: false,
+			// 	}),
+			// });
+			// await removeNotificationToken();
+			// Alert.alert('Notifications Disabled', 'You will no longer receive notifications');
+		}
+	};
 
 	const handleSignOut = () => {
 		signOut();
@@ -46,19 +84,10 @@ const ProfileScreen = () => {
 
 			<View style={styles.settingsSection}>
 				<View style={styles.settingItem}>
-					<Text style={styles.settingLabel}>Dark Mode</Text>
-					<Switch
-						value={darkMode}
-						onValueChange={setDarkMode}
-						trackColor={{ false: "#767577", true: "#7b45a6" }}
-					/>
-				</View>
-
-				<View style={styles.settingItem}>
 					<Text style={styles.settingLabel}>Notifications</Text>
 					<Switch
-						value={notifications}
-						onValueChange={setNotifications}
+						value={notificationsEnabled}
+						onValueChange={handleNotificationToggle}
 						trackColor={{ false: "#767577", true: "#7b45a6" }}
 					/>
 				</View>

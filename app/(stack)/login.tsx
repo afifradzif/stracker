@@ -58,18 +58,6 @@ export default function LoginScreen() {
 					paddingHorizontal={90}
 				/>
 			</View>
-			<View style={{ flexDirection: "row", marginTop: 20 }}>
-				<TouchableOpacity style={{ marginHorizontal: 10 }}>
-					<Image
-						source={{ uri: "https://img.icons8.com/color/50/000000/google-logo.png" }}
-						style={{ width: 40, height: 40 }}
-					/>
-				</TouchableOpacity>
-				<TouchableOpacity style={{ marginHorizontal: 10 }}>
-					<MaterialIcons name="phone" size={40} color="#D8BFD8" />
-				</TouchableOpacity>
-			</View>
-			<Text style={{ color: "#696969", marginTop: 10 }}>Don't have an account yet?</Text>
 		</CustomBackground>
 	);
 }

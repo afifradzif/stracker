@@ -30,7 +30,7 @@ export default function HomeScreen() {
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.header}>
 					<Text style={styles.headerText}>Hello, {getCurrentUserName()}</Text>
-					<Text style={styles.dateText}>{new Date().toLocaleDateString()}</Text>
+					<Text style={styles.dateText}>As of {new Date().toLocaleDateString()}</Text>
 				</View>
 
 				<View style={styles.statsContainer}>
@@ -100,9 +100,9 @@ export default function HomeScreen() {
 						<Text style={styles.menuText}>Me</Text>
 					</TouchableOpacity>
 				</View>
-				<TouchableOpacity style={styles.floatingButton} onPress={handleAddButtonPress}>
+				{/* <TouchableOpacity style={styles.floatingButton} onPress={handleAddButtonPress}>
 					<Text style={styles.floatingButtonText}>+</Text>
-				</TouchableOpacity>
+				</TouchableOpacity> */}
 			</SafeAreaView>
 			<CustomBottomSheet ref={bottomSheetRef}>
 					<View style={styles.bottomSheetContent}>
