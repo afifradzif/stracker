@@ -24,7 +24,7 @@ export default function HomeScreen() {
 
 	const completedTasks = tasks.filter(t => t.completed).length;
 	const upcomingStudyPlans = studyPlans
-		.filter(p => new Date(p.date) > new Date())
+		.filter(p => new Date(p.date) > new Date() && !p.completed)
 		.slice(0, 3);
 
 	// Refresh data when screen comes into focus

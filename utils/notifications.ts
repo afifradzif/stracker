@@ -47,9 +47,9 @@ export async function scheduleNotification(title: string, body: string, trigger:
   });
 }
 
-export const calculateReminderDate = (dueDate: Date, reminderType: string): Date => {
-  const now = new Date();
+export const calculateReminderDate = (dueDate: Date | string, reminderType: string): Date => {
   const targetDate = new Date(dueDate);
+  const now = new Date();
 
   switch (reminderType) {
     case '1 day before':
@@ -125,9 +125,11 @@ export const schedulePushNotification = async ({
 }: {
   title: string;
   body: string;
-  trigger: Date;
+  trigger: Date | string;
 }) => {
-  const seconds = Math.max(1, Math.floor((trigger.getTime() - Date.now()) / 1000));
+  // Convert string date to Date object if needed
+  const triggerDate = trigger instanceof Date ? trigger : new Date(trigger);
+  const seconds = Math.max(1, Math.floor((triggerDate.getTime() - Date.now()) / 1000));
   
   return await Notifications.scheduleNotificationAsync({
     content: {
