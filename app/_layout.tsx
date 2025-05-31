@@ -7,14 +7,24 @@ import { useAuthStore } from "@/hooks/use-auth";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { registerForPushNotificationsAsync } from '../utils/notifications';
+import { MMKV } from "react-native-mmkv";
+const storage = new MMKV();
 
 export default function RootLayout() {
 	const [loaded, setLoaded] = useState(false);
 	const { auth } = useAuthStore();
+	const [isFirstTime, setIsFirstTime] = useState(storage.getString("isFirstTime") !== "true");
 
-	  useEffect(() => {
+	useEffect(() => {
 		registerForPushNotificationsAsync();
-	  }, []);
+	}, []);
+
+	useEffect(() => {
+		if(isFirstTime) {
+			console.log("First time user detected, setting isFirstTime to true in storage.");
+			storage.set("isFirstTime", "true");
+		}
+	}, []);
 
 	useEffect(() => {
 		async function prepare() {
@@ -44,7 +54,11 @@ export default function RootLayout() {
 			<BottomSheetModalProvider>
 				<RootSiblingParent>
 					<Slot />
+					{isFirstTime ? (
+						<Redirect href="/(stack)/introduction" />
+					) : (
 						<Redirect href="/(stack)/login" />
+					)}
 				</RootSiblingParent>
 			</BottomSheetModalProvider>
 		</GestureHandlerRootView>
