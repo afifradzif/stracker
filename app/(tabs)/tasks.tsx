@@ -8,9 +8,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import CustomBackground from "@/components/CustomBackground";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
 import CustomButton from "@/components/CustomButton";
-import { createId } from "@paralleldrive/cuid2";
 import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import Slider from "@react-native-community/slider";
+import { createId } from "@paralleldrive/cuid2";
 
 const reminderOptions = [
 	{ label: "Everyday", value: "Everyday" },
@@ -28,13 +28,22 @@ export default function TaskScreen() {
 	const reminderSheetRef = useRef(null);
 
 	const [newTask, setNewTask] = useState({
-		id: createId(),
 		title: "",
 		due: new Date(),
 		reminder: "",
 		completed: false,
 		progress: 0,
 	});
+
+	const resetNewTask = () => {
+		setNewTask({
+			title: "",
+			due: new Date(),
+			reminder: "",
+			completed: false,
+			progress: 0,
+		});
+	};
 
 	const [showDatePicker, setShowDatePicker] = useState(false);
 	const [showTimePicker, setShowTimePicker] = useState(false);
@@ -63,15 +72,13 @@ export default function TaskScreen() {
 
 	const handleAddTask = () => {
 		if (newTask.title.trim() && newTask.reminder) {
-			addTask(newTask);
-			setNewTask({
+			// Add ID to the task before saving
+			const taskWithId = {
+				...newTask,
 				id: createId(),
-				title: "",
-				due: new Date(),
-				reminder: "",
-				completed: false,
-				progress: 0,
-			});
+			};
+			addTask(taskWithId);
+			resetNewTask();
 			addTaskSheetRef.current?.dismiss();
 		}
 	};

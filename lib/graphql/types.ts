@@ -21,12 +21,12 @@ export type StudyPlan = {
 };
 
 export type Task = {
-  id: string;
-  user_id: string;
+  id: string; // Make id required
+  user_id?: string;
   title: string;
   due: Date;
   reminder: string;
   completed: boolean;
   progress: number;
-  created_at: string;
+  created_at?: string;
 };

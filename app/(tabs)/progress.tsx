@@ -22,6 +22,7 @@ import CustomBottomSheet from "@/components/CustomBottomSheet";
 import CustomButton from "@/components/CustomButton";
 import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import Slider from "@react-native-community/slider";
+import { createId } from "@paralleldrive/cuid2";
 
 const reminderOptions = [
 	{ label: "Everyday", value: "Everyday" },
@@ -77,7 +78,6 @@ export default function ProgressScreen() {
 
 	// Add the same task state as in tasks.tsx
 	const [newTask, setNewTask] = useState({
-		id: "",
 		title: "",
 		due: new Date(),
 		reminder: "",
@@ -85,18 +85,25 @@ export default function ProgressScreen() {
 		progress: 0,
 	});
 
+	const resetNewTask = () => {
+		setNewTask({
+			title: "",
+			due: new Date(),
+			reminder: "",
+			completed: false,
+			progress: 0,
+		});
+	};
+
 	// Copy these handlers from tasks.tsx
 	const handleAddTask = () => {
 		if (newTask.title.trim() && newTask.reminder) {
-			addTask(newTask);
-			setNewTask({
-				id: "",
-				title: "",
-				due: new Date(),
-				reminder: "",
-				completed: false,
-				progress: 0,
-			});
+			const taskWithId = {
+				...newTask,
+				id: createId(),
+			};
+			addTask(taskWithId);
+			resetNewTask();
 			addTaskSheetRef.current?.dismiss();
 		}
 	};

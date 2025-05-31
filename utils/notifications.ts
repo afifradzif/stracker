@@ -47,40 +47,33 @@ export async function scheduleNotification(title: string, body: string, trigger:
   });
 }
 
-export const schedulePushNotification = async ({
-  title,
-  body,
-  trigger,
-}: {
-  title: string;
-  body: string;
-  trigger: any;
-}) => {
-  const id = await Notifications.scheduleNotificationAsync({
-    content: {
-      title,
-      body,
-      sound: 'default',
-    },
-    trigger,
-  });
-  return id;
-};
-
 export const calculateReminderDate = (dueDate: Date, reminderType: string): Date => {
-  const date = new Date(dueDate);
+  const now = new Date();
+  const targetDate = new Date(dueDate);
+
   switch (reminderType) {
     case '1 day before':
-      date.setDate(date.getDate() - 1);
+      targetDate.setDate(targetDate.getDate() - 1);
       break;
     case '1 week before':
-      date.setDate(date.getDate() - 7);
+      targetDate.setDate(targetDate.getDate() - 7);
       break;
-    default:
-      // For "Everyday", return current date
-      return new Date();
+    case 'Everyday':
+      // For everyday reminders, set it to the next occurrence of the reminder time
+      targetDate.setHours(9, 0, 0, 0); // Set to 9 AM
+      if (targetDate < now) {
+        targetDate.setDate(targetDate.getDate() + 1);
+      }
+      break;
   }
-  return date;
+
+  // Ensure reminder time is in the future
+  if (targetDate <= now) {
+    targetDate.setDate(now.getDate() + 1);
+    targetDate.setHours(9, 0, 0, 0);
+  }
+
+  return targetDate;
 };
 
 export const setupDailyMotivation = async (type: string, studyTitle: string) => {
@@ -122,5 +115,28 @@ export const setupDailyMotivation = async (type: string, studyTitle: string) => 
     title: `Study Motivation - ${studyTitle}`,
     body: message,
     trigger,
+  });
+};
+
+export const schedulePushNotification = async ({
+  title,
+  body,
+  trigger,
+}: {
+  title: string;
+  body: string;
+  trigger: Date;
+}) => {
+  const seconds = Math.max(1, Math.floor((trigger.getTime() - Date.now()) / 1000));
+  
+  return await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+      sound: 'default',
+    },
+    trigger: {
+      seconds: seconds,
+    },
   });
 };
