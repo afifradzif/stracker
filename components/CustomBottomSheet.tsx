@@ -6,7 +6,7 @@ import {
 	type BottomSheetBackdropProps,
 	BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
-import { StyleSheet } from "react-native";
+import { StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 
 interface CustomBottomSheetProps {
 	children: React.ReactNode;
@@ -34,11 +34,19 @@ const CustomBottomSheet = forwardRef<BottomSheetModal, CustomBottomSheetProps>(
 				<BottomSheetModal
 					ref={ref}
 					backdropComponent={renderBackdrop}
+					snapPoints={["85%"]} // Increased height for better keyboard handling
 					enablePanDownToClose
-					onDismiss={onClose}
+					enableDismissOnClose
+					keyboardBehavior="extend" // Add this to make sheet extend with keyboard
+					android_keyboardInputMode="adjustPan" // Better Android keyboard handling
 					style={styles.modal} // Ensure it appears in front
 				>
-					<BottomSheetView style={styles.contentContainer}>{children}</BottomSheetView>
+					<KeyboardAvoidingView
+						behavior={Platform.OS === "ios" ? "padding" : undefined}
+						style={styles.contentContainer}
+					>
+						<BottomSheetView style={styles.contentContainer}>{children}</BottomSheetView>
+					</KeyboardAvoidingView>
 				</BottomSheetModal>
 			</BottomSheetModalProvider>
 		);
@@ -52,7 +60,7 @@ const styles = StyleSheet.create({
 	},
 	contentContainer: {
 		flex: 1,
-		padding: 16,
+		padding: 10,
 	},
 });
 

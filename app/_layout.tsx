@@ -45,19 +45,15 @@ export default function RootLayout() {
 		prepare();
 	}, [auth]);
 
-	if (!loaded) {
-		return <Slot />;
-	}
-
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<BottomSheetModalProvider>
 				<RootSiblingParent>
 					<Slot />
-					{isFirstTime ? (
+					{!loaded ? null : isFirstTime && !auth.isLoggedIn ? (
 						<Redirect href="/(stack)/introduction" />
 					) : (
-						<Redirect href="/(stack)/login" />
+						<Redirect href={auth.isLoggedIn ? "/(tabs)" : "/(stack)/login"} />
 					)}
 				</RootSiblingParent>
 			</BottomSheetModalProvider>

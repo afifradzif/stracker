@@ -57,7 +57,7 @@ const ProfileScreen = () => {
 
 	const handleSignOut = () => {
 		signOut();
-		router.navigate("/(stack)/login");
+		router.replace("/(stack)/login");
 	};
 
 	const handleClearAllData = () => {
